@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 01: The AI Evolution Landscape</title>
+    <style>
+        :root {
+            --primary-green: #15803d;
+            --light-green: #bbf7d0;
+            --accent-green: #f0fdf4;
+            --dark-black: #111827;
+            --soft-black: #374151;
+            --pure-white: #ffffff;
+            --bg-gray: #f9fafb;
+            --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-gray: #111827;
+            --dark-black: #f9fafb;
+            --soft-black: #e5e7eb;
+            --pure-white: #1f2937;
+            --card-bg: #1f2937;
+            --border-color: #374151;
+            --accent-green: #14532d;
+            --light-green: #15803d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-gray);
+            color: var(--dark-black);
+            line-height: 1.6;
+            padding-bottom: 5rem;
+        }
+
+        header {
+            background-color: #111827;
+            color: #ffffff;
+            padding: 2rem;
+            border-bottom: 5px solid var(--primary-green);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-back {
+            color: var(--light-green);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .nav-back:hover {
+            text-decoration: underline;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .theme-toggle-btn:hover {
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .lesson-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green);
+            padding-left: 1rem;
+        }
+
+        .description-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .description-box p {
+            margin-bottom: 1rem;
+            color: var(--soft-black);
+        }
+        .description-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1.25rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green);
+            color: var(--dark-black);
+        }
+
+        /* Objectives */
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .objectives-list li::before {
+            content: "✓";
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        /* Key Terms Flip Cards Grid */
+        .terms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 150px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .flip-card-front {
+            background-color: var(--card-bg);
+            color: var(--dark-black);
+            border-bottom: 4px solid var(--primary-green);
+        }
+
+        .flip-card-front strong {
+            font-size: 1.1rem;
+        }
+
+        .flip-card-front span {
+            font-size: 0.75rem;
+            color: var(--primary-green);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .flip-card-back {
+            background-color: var(--dark-black);
+            color: var(--bg-gray);
+            transform: rotateY(180deg);
+            font-size: 0.9rem;
+        }
+
+        /* Multipage Content Window */
+        .content-window {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+
+        .content-tabs {
+            display: flex;
+            background-color: rgba(0,0,0,0.03);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--soft-black);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-green);
+            border-bottom-color: var(--primary-green);
+            background-color: var(--card-bg);
+        }
+
+        .content-pane {
+            display: none;
+            padding: 2rem;
+        }
+
+        .content-pane.active {
+            display: block;
+        }
+
+        .analogy-box {
+            background-color: var(--accent-green);
+            border-left: 4px solid var(--primary-green);
+            padding: 1rem 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            color: var(--dark-black);
+        }
+
+        /* Activities Section */
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .activity-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--dark-black);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .activity-card:hover {
+            border-color: var(--primary-green);
+        }
+
+        .activity-num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .activity-card p {
+            font-size: 0.9rem;
+            color: var(--soft-black);
+            margin-bottom: 1.5rem;
+        }
+
+        .launch-btn {
+            background-color: var(--primary-green);
+            color: white;
+            text-decoration: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .launch-btn:hover {
+            opacity: 0.9;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 5rem;
+            color: var(--soft-black);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <a href="index.html" class="nav-back">← Back to Course Dashboard</a>
+        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Lesson Headers -->
+    <div class="lesson-header">
+        <h1>Lesson 01: The AI Evolution Landscape</h1>
+        <div class="description-box">
+            <p><strong>Course Target:</strong> Mapping the paradigm shift from basic text generation and predictive text prompts directly into production-grade agent orchestration stacks.</p>
+            <p>Educators in this module will investigate the historical and technological evolution that moves beyond simple user-prompt frameworks into proactive systems capable of execution and environment exploration. This transition replaces single-turn query behaviors with long-form automated productivity structures across high-fidelity classroom and administrative platforms.</p>
+        </div>
+    </div>
+
+    <!-- Learning Objectives -->
+    <h2>Learning Objectives</h2>
+    <ul class="objectives-list">
+        <li>Analyze the core distinctions between historical static prompting systems and modern agent-led automation frameworks.</li>
+        <li>Identify the engineering parameters that allow an optimization model to progress from generation to systemic action execution.</li>
+        <li>Design initial strategic frameworks utilizing automated pipelines to mitigate common institutional resource bottlenecks.</li>
+    </ul>
+
+    <!-- Key Terms (Flip-Cards) -->
+    <h2>Key Terms</h2>
+    <p style="font-size:0.9rem; color:var(--soft-black); margin-bottom: 1rem;">Click any card below to flip and reveal its technical definition.</p>
+    <div class="terms-grid">
+        <!-- Card 1 -->
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <strong>Generative Bot</strong>
+                    <span>Level 1</span>
+                </div>
+                <div class="flip-card-back">
+                    <p>A reactive chatbot engine structured to produce immediate contextual language vectors directly in response to user text queries without managing subsequent operations.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <strong>Autonomous Agent</strong>
+                    <span>Level 2</span>
+                </div>
+                <div class="flip-card-back">
+                    <p>An integrated LLM infrastructure containing planning, memory matrix configurations, and explicit execution routes designed to execute long-form goals autonomously.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <strong>Agentic Browser</strong>
+                    <span>Level 3</span>
+                </div>
+                <div class="flip-card-back">
+                    <p>An execution architecture capable of parsing semantic application layouts to interact with forms, links, and operational datasets via native browser interfaces directly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multipage Content Section -->
+    <h2>Course Outline & Lesson Modules</h2>
+    <div class="content-window">
+        <div class="content-tabs">
+            <button class="tab-btn active" onclick="switchPage(0)">Page 1: The Linear Shift</button>
+            <button class="tab-btn" onclick="switchPage(1)">Page 2: Production Stacks</button>
+            <button class="tab-btn" onclick="switchPage(2)">Page 3: Operational Impact</button>
+        </div>
+
+        <!-- Page 1 -->
+        <div class="content-pane active" id="pane-0">
+            <h3>Breaking the Constraints of Linear Input Chains</h3>
+            <p style="margin-top:1rem;">Traditional interface deployments restrict professional automation by operating strictly under explicit user management loops. Within this architecture, the engine acts purely reactively. If the prompt lacks precision, optimization fails. This linear context chain places the engineering and structural burden directly onto the instructor's immediate inputs.</p>
+            <p style="margin-top:1rem;">Agent systems reconstruct this hierarchy by treating the underlying large language model as a structural engine rather than a text window. The introduction of autonomous processing frameworks transfers task design directly to the agent system itself, allowing it to generate its own sub-tasks and review output metrics continuously.</p>
+            <div class="analogy-box">
+                <strong>Conceptual Analogy:</strong> Traditional conversational systems function like a digital typewriter—they execute only when keys are actively pressed. Agentic architectures behave like an instructional manager, given a specific curriculum milestone, they autonomously organize schedules, map competencies, and prepare content without requiring manual keys for every step.
+            </div>
+        </div>
+
+        <!-- Page 2 -->
+        <div class="content-pane" id="pane-1">
+            <h3>The Integration of Production-Grade Stacks</h3>
+            <p style="margin-top:1rem;">Modern professional automation integrates direct environmental interactions into core systemic routines. Production-grade orchestration stacks connect the central processing model directly to API networks, persistent context directories, and sandbox code deployment zones. This enables multi-stage workflows to verify outputs against live data parameters.</p>
+            <p style="margin-top:1rem;">Through standard model integration systems, an agent checks external source materials, builds analytical programs to process local tracking datasets, and runs validation scripts prior to showing any summaries. This prevents the generation of fabricated metrics and ensures strict data alignment.</p>
+            <h3>Practical Implementation Example</h3>
+            <p style="margin-top:1rem;">An instructor uploads a core department syllabus matrix. The agent executes an automated compliance check routine by inspecting regional policy databases, analyzing alignment gaps, writing an updated weekly course path, and constructing structured grading rubrics directly inside operational sandbox workspaces.</p>
+        </div>
+
+        <!-- Page 3 -->
+        <div class="content-pane" id="pane-2">
+            <h3>Systemic Automation Profiles across Modern Institutions</h3>
+            <p style="margin-top:1rem;">Transitioning administrative operations to modern automated architectures removes the need to constantly write repetitive prompting structures for recurring tasks. Because these frameworks process workflows over extended operational loops, they can manage multi-page data validation runs without manual oversight.</p>
+            <p style="margin-top:1rem;">By isolating repetitive administrative workloads inside secure agent zones, education teams can protect local work records while speeding up compliance reporting, program reviews, and complex resource mapping tasks across the board.</p>
+        </div>
+    </div>
+
+    <!-- Three Hands-on Activities -->
+    <h2>Hands-on Workspace Modules</h2>
+    <div class="activities-grid">
+        <!-- Activity 1 -->
+        <div class="activity-card">
+            <div>
+                <div class="activity-num">Activity 01</div>
+                <h3>Engine Matrix Assessment</h3>
+                <p>Run explicit multi-turn data tracking scenarios side-by-side using Gemini and ChatGPT to record processing speeds, context alignment, and structural format accuracy.</p>
+            </div>
+            <a href="lesson01-act01.html" class="launch-btn">Open Activity 1</a>
+        </div>
+
+        <!-- Activity 2 -->
+        <div class="activity-card">
+            <div>
+                <div class="activity-num">Activity 02</div>
+                <h3>Workspace Architecture Generation</h3>
+                <p>Deploy specialized reasoning templates within Claude's interactive Artifact window to construct functional curriculum evaluation models instantly.</p>
+            </div>
+            <a href="lesson01-act02.html" class="launch-btn">Open Activity 2</a>
+        </div>
+
+        <!-- Activity 3 -->
+        <div class="activity-card">
+            <div>
+                <div class="activity-num">Activity 03</div>
+                <h3>Pipeline Verification Lab</h3>
+                <p>Configure automated multi-source tracking collections within Perplexity to gather and verify policy datasets across five distinct academic systems.</p>
+            </div>
+            <a href="lesson01-act03.html" class="launch-btn">Open Activity 3</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course | System Layout Reference: image_945487.png
+</footer>
+
+<script>
+    // Multipage content engine navigation
+    function switchPage(pageIndex) {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panes = document.querySelectorAll('.content-pane');
+        
+        tabs.forEach((tab, index) => {
+            if(index === pageIndex) {
+                tab.classList.add('active');
+                panes[index].classList.add('active');
+            } else {
+                tab.classList.remove('active');
+                panes[index].classList.remove('active');
+            }
+        });
+    }
+
+    // Light / Dark core mode engine switch
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.getElementById('themeToggle').textContent = '🌓 Toggle Dark Mode';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeToggle').textContent = '☀️ Toggle Light Mode';
+        }
+    }
+</script>
+</body>
+</html>
