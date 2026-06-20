@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering AI Automation: Bots, Agents & Agentic Browsers</title>
+    <style>
+        :root {
+            --primary-green: #15803d;
+            --light-green: #bbf7d0;
+            --accent-green: #f0fdf4;
+            --dark-black: #111827;
+            --soft-black: #374151;
+            --pure-white: #ffffff;
+            --bg-gray: #f9fafb;
+            --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-gray);
+            color: var(--dark-black);
+            line-height: 1.5;
+        }
+
+        header {
+            background-color: var(--dark-black);
+            color: var(--pure-white);
+            padding: 3rem 2rem;
+            border-bottom: 5px solid var(--primary-green);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header-title-area {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo-badge {
+            background-color: var(--primary-green);
+            color: var(--pure-white);
+            font-size: 2rem;
+            font-weight: 800;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--pure-white);
+        }
+
+        .header-text h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-text p {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        .course-code {
+            border: 1px solid var(--primary-green);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            background-color: rgba(21, 128, 61, 0.1);
+            color: var(--light-green);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .overview-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .overview-card {
+            background-color: var(--pure-white);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-green);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .overview-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-black);
+        }
+
+        .engine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .engine-badge {
+            background: var(--accent-green);
+            border: 1px solid var(--light-green);
+            padding: 0.75rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-green);
+            font-size: 0.9rem;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem 2rem;
+        }
+
+        .section-divider {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--dark-black);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .lesson-card {
+            background-color: var(--pure-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-green);
+            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.08);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .day-badge {
+            background-color: var(--dark-black);
+            color: var(--pure-white);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .track-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            background-color: var(--accent-green);
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            border: 1px solid var(--light-green);
+        }
+
+        .lesson-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-black);
+            margin-bottom: 0.5rem;
+        }
+
+        .lesson-desc {
+            font-size: 0.925rem;
+            color: var(--soft-black);
+            margin-bottom: 1rem;
+        }
+
+        .card-footer {
+            background-color: var(--bg-gray);
+            border-top: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .key-terms {
+            color: var(--soft-black);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 85%;
+        }
+
+        .arrow-indicator {
+            color: var(--primary-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.15s ease;
+        }
+
+        .lesson-card:hover .arrow-indicator {
+            transform: translateX(3px);
+        }
+
+        .action-container {
+            padding: 0 1.5rem 1.2rem 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .activity-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            background-color: var(--pure-white);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            text-decoration: none;
+            width: 100%;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .activity-btn:hover {
+            background-color: var(--primary-green);
+            color: var(--pure-white);
+        }
+
+        footer {
+            background-color: var(--dark-black);
+            color: #9ca3af;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+            border-top: 4px solid var(--primary-green);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <div class="header-title-area">
+            <div class="logo-badge">AI</div>
+            <div class="header-text">
+                <h1>Mastering AI Automation</h1>
+                <p>Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+            </div>
+        </div>
+        <div>
+            <span class="course-code">NSF-CC-2026</span>
+        </div>
+    </div>
+</header>
+
+<div class="overview-section">
+    <div class="overview-card">
+        <h2>Course Navigation Dashboard</h2>
+        <p>Select a lesson card below to access the daily instructional materials, technical specifications, and core guides. Each lesson targets a distinct milestone in automated agent architecture.</p>
+        <div class="engine-grid">
+            <div class="engine-badge">🤖 Google Gemini</div>
+            <div class="engine-badge">🔮 Anthropic Claude</div>
+            <div class="engine-badge">🔍 Perplexity Pro</div>
+            <div class="engine-badge">⚡ OpenAI ChatGPT</div>
+        </div>
+    </div>
+</div>
+
+<main>
+
+    <!-- DAY 1 WORKFLOWS -->
+    <div class="section-divider">📚 Day 1 — Foundations of Bots & Autonomous Agents</div>
+    <div class="card-grid">
+
+        <!-- Lesson 1 -->
+        <div class="lesson-card">
+            <a href="lesson01.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 01</span>
+                        <span class="track-badge">Introduction</span>
+                    </div>
+                    <div class="lesson-title">The AI Evolution Landscape</div>
+                    <div class="lesson-desc">Mapping the paradigm shift from basic text generation and predictive text prompts directly into production-grade agent orchestration stacks.</div>
+                </div>
+            </a>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> AI Trajectory, Prompt Shifting, Workflow Evolution</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 2 -->
+        <div class="lesson-card">
+            <a href="lesson02.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 02</span>
+                        <span class="track-badge">Architecture</span>
+                    </div>
+                    <div class="lesson-title">Anatomy of a Bot vs. Agent</div>
+                    <div class="lesson-desc">Deep structural exploration of memory registers, action loops, tools, and the core differences between reactive bots and goal-driven autonomous systems.</div>
+                </div>
+            </a>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Action Loops, System Memory, Guardrails</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 3 -->
+        <div class="lesson-card">
+            <a href="lesson03.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 03</span>
+                        <span class="track-badge">Core Tooling</span>
+                    </div>
+                    <div class="lesson-title">Mastering Gemini & ChatGPT</div>
+                    <div class="lesson-desc">Comparing multi-modal execution capabilities, live system grounding protocols, and advanced conditioning patterns across industry-standard engines.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson03-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 1</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Grounding, Comparison Matrix, Multi-Modal</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 4 -->
+        <div class="lesson-card">
+            <a href="lesson04.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 04</span>
+                        <span class="track-badge">Core Tooling</span>
+                    </div>
+                    <div class="lesson-title">Reasoning & Workspaces in Claude</div>
+                    <div class="lesson-desc">Leveraging Claude’s precise reasoning engine alongside stateful interactive Artifact workspaces to accelerate curriculum and assessment production.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson04-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 2</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Artifacts, Advanced Rubrics, System Structure</span>
+                <span class="arrow-indicator">--></span>
+            </div>
+        </div>
+
+        <!-- Lesson 5 -->
+        <div class="lesson-card">
+            <a href="lesson05.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 05</span>
+                        <span class="track-badge">Research</span>
+                    </div>
+                    <div class="lesson-title">Information Synthesis with Perplexity</div>
+                    <div class="lesson-desc">Deploying real-time multi-source search engines as deep verification agents. Creating dedicated system memory modules via specialized workspace Collections.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson05-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 3</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Source Validation, Collections, Integrity</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 6 -->
+        <div class="lesson-card">
+            <a href="lesson06.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 06</span>
+                        <span class="track-badge">Development</span>
+                    </div>
+                    <div class="lesson-title">Designing Custom Assistants</div>
+                    <div class="lesson-desc">Engineering code-free personalized specialized modules (Custom GPTs/Gems). Fine-tuning interaction paths and embedding structural knowledge frameworks.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson06-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 4</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Socratic Scaffolding, Context Grounding</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DAY 2 WORKFLOWS -->
+    <div class="section-divider">🌐 Day 2 — Agentic Browsers & Advanced Automation</div>
+    <div class="card-grid">
+
+        <!-- Lesson 7 -->
+        <div class="lesson-card">
+            <a href="lesson07.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 07</span>
+                        <span class="track-badge">Browsers</span>
+                    </div>
+                    <div class="lesson-title">The Frontier of Agentic Browsing</div>
+                    <div class="lesson-desc">An introduction to Comet, Atlas, and Auto-Browse engines that process semantic web hierarchies and visually coordinate interaction paths directly on live sites.</div>
+                </div>
+            </a>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Semantic HTML, Navigation Logic, Edge Cases</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 8 -->
+        <div class="lesson-card">
+            <a href="lesson08.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 08</span>
+                        <span class="track-badge">Workflows</span>
+                    </div>
+                    <div class="lesson-title">Multi-Step Research Workflows</div>
+                    <div class="lesson-desc">Configuring agentic web systems to execute long-form discovery loops, handle dynamic state memory across multiple sites, and synthesize tabular data.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson08-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 5</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Grant Discovery, Tabular Synthesis</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 9 -->
+        <div class="lesson-card">
+            <a href="lesson09.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 09</span>
+                        <span class="track-badge">Automation</span>
+                    </div>
+                    <div class="lesson-title">Data Extraction & Administration</div>
+                    <div class="lesson-desc">Automating complex reporting sequences, compliance mapping, form ingestion targets, and structuring document assembly lines safely.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson09-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 6</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> Form Filling, Compliance Reporting</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 10 -->
+        <div class="lesson-card">
+            <a href="lesson10.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 10</span>
+                        <span class="track-badge">Protocols</span>
+                    </div>
+                    <div class="lesson-title">Tool Integration & MCP Frameworks</div>
+                    <div class="lesson-desc">Analyzing how system engines interact with sandbox execution tools and securely query remote data nodes via Model Context Protocol frameworks.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson10-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 7</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> MCP Standard, Code Sandboxes, Data Analysis</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 11 -->
+        <div class="lesson-card">
+            <a href="lesson11.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 11</span>
+                        <span class="track-badge">Governance</span>
+                    </div>
+                    <div class="lesson-title">Ethics, Security, & Governance</div>
+                    <div class="lesson-desc">Structuring institutional boundaries. Mitigating prompt-injection vectors, addressing privacy frameworks (FERPA), and ensuring WCAG accessibility metrics.</div>
+                </div>
+            </a>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> FERPA Security, Privilege Escalation</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+        <!-- Lesson 12 -->
+        <div class="lesson-card">
+            <a href="lesson12.html" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="day-badge">Lesson 12</span>
+                        <span class="track-badge">Capstone</span>
+                    </div>
+                    <div class="lesson-title">Deploying Your Agentic Workflow</div>
+                    <div class="lesson-desc">Capstone presentation event. Deploying a comprehensive automation pipeline addressing standard academic administration bottlenecks.</div>
+                </div>
+            </a>
+            <div class="action-container">
+                <a href="lesson12-act01.html" class="activity-btn">🔬 Launch Hands-On Activity 8</a>
+            </div>
+            <div class="card-footer">
+                <span class="key-terms"><strong>Focus:</strong> End-to-End Pipelines, Peer Optimization</span>
+                <span class="arrow-indicator">→</span>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    Mastering AI Automation  |  12-Lesson Course  |  National Faculty Development Training Center  |  Department of Information Technology
+</footer>
+
+<script>
+    // Console log confirming semantic alignment and framework validation
+    console.log("AI Agentic Platform Launch Ready. Navigation mapped to 12 production elements.");
+</script>
+</body>
+</html>
