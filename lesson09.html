@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 09 of Mastering AI Automation: automating data extraction, document/form assembly, and compliance reporting safely — with verification, de-identification, and human sign-off — for faculty.">
+<title>Lesson 09: Data Extraction &amp; Administration</title>
+<style>
+:root{--primary-green:#15803d;--light-green:#bbf7d0;--accent-green:#f0fdf4;--dark-black:#111827;
+--soft-black:#374151;--pure-white:#ffffff;--bg-gray:#f9fafb;--border-color:#e5e7eb;
+--font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--card-bg:#ffffff;--code-bg:#f3f4f6;--focus-ring:#166534;}
+[data-theme="dark"]{--bg-gray:#111827;--dark-black:#f9fafb;--soft-black:#d1d5db;--pure-white:#1f2937;
+--card-bg:#1f2937;--border-color:#374151;--accent-green:#14532d;--light-green:#4ade80;--code-bg:#0f172a;--focus-ring:#4ade80;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg-gray:#111827;--dark-black:#f9fafb;
+--soft-black:#d1d5db;--pure-white:#1f2937;--card-bg:#1f2937;--border-color:#374151;--accent-green:#14532d;
+--light-green:#4ade80;--code-bg:#0f172a;--focus-ring:#4ade80;}}
+*{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s ease,color .2s ease,border-color .2s ease;}
+body{font-family:var(--font-family);background-color:var(--bg-gray);color:var(--dark-black);line-height:1.6;padding-bottom:5rem;}
+a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px;border-radius:4px;}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--primary-green);color:#fff;padding:.75rem 1rem;z-index:100;border-radius:0 0 6px 0;font-weight:600;text-decoration:none;}
+.skip-link:focus{left:0;}
+header.site{background-color:#111827;color:#fff;padding:2rem;border-bottom:5px solid var(--primary-green);}
+.header-container{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+.nav-back{color:#86efac;text-decoration:none;font-weight:600;font-size:.95rem;min-height:44px;display:inline-flex;align-items:center;}
+.nav-back:hover{text-decoration:underline;}
+.theme-toggle-btn{background-color:var(--primary-green);color:#fff;border:none;padding:.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;font-size:.85rem;min-height:44px;}
+.theme-toggle-btn:hover{opacity:.9;}
+.container{max-width:1100px;margin:2rem auto;padding:0 1.5rem;}
+.lesson-header{margin-bottom:2.5rem;}
+.eyebrow{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--primary-green);margin-bottom:.75rem;}
+.lesson-header h1{font-size:clamp(1.9rem,4vw,2.5rem);font-weight:800;margin-bottom:1rem;border-left:6px solid var(--primary-green);padding-left:1rem;line-height:1.15;}
+.description-box{background-color:var(--card-bg);border:1px solid var(--border-color);padding:1.5rem;border-radius:8px;margin-bottom:2rem;}
+.description-box p{margin-bottom:1rem;color:var(--soft-black);} .description-box p:last-child{margin-bottom:0;}
+h2{font-size:1.5rem;margin:2.5rem 0 1.25rem;padding-bottom:.5rem;border-bottom:2px solid var(--primary-green);color:var(--dark-black);}
+.objectives-list{list-style:none;}
+.objectives-list li{background:var(--card-bg);border:1px solid var(--border-color);padding:1rem 1rem 1rem 2.5rem;margin-bottom:.5rem;border-radius:6px;position:relative;color:var(--soft-black);}
+.objectives-list li::before{content:"\2713";color:var(--primary-green);font-weight:bold;position:absolute;left:1rem;top:1rem;}
+.terms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-top:1rem;}
+.flip-card{background-color:transparent;width:100%;height:210px;perspective:1000px;cursor:pointer;border:none;padding:0;font-family:inherit;text-align:inherit;display:block;}
+.flip-card-inner{position:relative;width:100%;height:100%;text-align:center;transition:transform .6s;transform-style:preserve-3d;}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg);}
+.flip-card-front,.flip-card-back{position:absolute;inset:0;width:100%;height:100%;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:8px;border:1px solid var(--border-color);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem;overflow:auto;}
+.flip-card-front{background-color:var(--card-bg);color:var(--dark-black);border-bottom:4px solid var(--primary-green);}
+.flip-card-front strong{font-size:1.1rem;}
+.flip-card-front .level{font-size:.75rem;color:var(--primary-green);margin-top:.5rem;text-transform:uppercase;letter-spacing:.05em;}
+.flip-card-front .hint{font-size:.7rem;color:var(--soft-black);margin-top:.75rem;}
+.flip-card-back{background-color:var(--dark-black);color:var(--bg-gray);transform:rotateY(180deg);font-size:.88rem;line-height:1.45;}
+[data-theme="dark"] .flip-card-back{background-color:#0b1220;color:#e5e7eb;}
+.content-window{background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;overflow:hidden;margin-top:1.5rem;}
+.content-tabs{display:flex;background-color:rgba(0,0,0,.03);border-bottom:1px solid var(--border-color);flex-wrap:wrap;}
+[data-theme="dark"] .content-tabs{background-color:rgba(255,255,255,.04);}
+.tab-btn{flex:1 1 180px;padding:1rem;background:none;border:none;font-weight:600;color:var(--soft-black);cursor:pointer;border-bottom:3px solid transparent;font-size:.95rem;min-height:44px;font-family:inherit;}
+.tab-btn[aria-selected="true"]{color:var(--primary-green);border-bottom-color:var(--primary-green);background-color:var(--card-bg);}
+.content-pane{padding:2rem;} .content-pane[hidden]{display:none;}
+.content-pane h3{color:var(--dark-black);font-size:1.2rem;margin-top:1.5rem;} .content-pane h3:first-child{margin-top:0;}
+.content-pane p{margin-top:1rem;color:var(--soft-black);}
+.content-pane ul,.content-pane ol{margin:1rem 0 1rem 1.5rem;} .content-pane li{margin:.4rem 0;color:var(--soft-black);}
+.analogy-box{background-color:var(--accent-green);border-left:4px solid var(--primary-green);padding:1rem 1.5rem;margin-top:1.5rem;border-radius:0 6px 6px 0;color:var(--dark-black);}
+[data-theme="dark"] .analogy-box{color:var(--bg-gray);}
+.analogy-box strong{color:var(--primary-green);} [data-theme="dark"] .analogy-box strong{color:var(--light-green);}
+.data-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1.25rem;}
+.data-table caption{text-align:left;font-size:.78rem;color:var(--soft-black);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em;}
+.data-table th,.data-table td{border:1px solid var(--border-color);padding:.6rem .75rem;text-align:left;vertical-align:top;color:var(--soft-black);}
+.data-table thead th{background:var(--accent-green);color:var(--dark-black);font-weight:700;} [data-theme="dark"] .data-table thead th{color:var(--bg-gray);}
+details.reveal{border:1px solid var(--border-color);border-radius:8px;background:var(--card-bg);padding:1rem 1.25rem;margin-top:1.25rem;}
+details.reveal>summary{cursor:pointer;font-weight:700;color:var(--primary-green);list-style:none;}
+details.reveal>summary::-webkit-details-marker{display:none;}
+details.reveal>summary::before{content:"\25B8  ";}
+details.reveal[open]>summary::before{content:"\25BE  ";}
+details.reveal[open]>summary{margin-bottom:.75rem;}
+details.reveal p{color:var(--soft-black);margin-top:.5rem;}
+.activities-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;}
+.activity-card{background-color:var(--card-bg);border:1px solid var(--border-color);border-top:4px solid var(--dark-black);border-radius:8px;padding:1.5rem;display:flex;flex-direction:column;justify-content:space-between;}
+.activity-card:hover{border-color:var(--primary-green);}
+.activity-num{font-size:.8rem;font-weight:700;color:var(--primary-green);text-transform:uppercase;margin-bottom:.5rem;letter-spacing:.05em;}
+.activity-card h3{font-size:1.2rem;margin-bottom:.75rem;color:var(--dark-black);}
+.activity-card p{font-size:.9rem;color:var(--soft-black);margin-bottom:1.5rem;}
+.activity-card .crit{font-size:.82rem;margin:0 0 1.25rem 1.1rem;color:var(--soft-black);} .activity-card .crit li{margin:.25rem 0;}
+.launch-btn{background-color:var(--primary-green);color:#fff;text-decoration:none;padding:.6rem 1rem;border-radius:6px;text-align:center;font-weight:600;font-size:.9rem;min-height:44px;display:flex;align-items:center;justify-content:center;}
+.launch-btn:hover{opacity:.9;}
+.callout{background:var(--accent-green);border:1px solid var(--light-green);border-radius:8px;padding:1.25rem 1.5rem;margin-top:1.5rem;color:var(--dark-black);}
+[data-theme="dark"] .callout{color:var(--bg-gray);}
+.callout strong{color:var(--primary-green);} [data-theme="dark"] .callout strong{color:var(--light-green);}
+.callout .label{display:block;font-weight:700;color:var(--primary-green);margin-bottom:.35rem;} [data-theme="dark"] .callout .label{color:var(--light-green);}
+.panel{background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:1.5rem;margin-top:1rem;}
+.fill-card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:1.5rem;display:grid;gap:1.25rem;margin-top:1rem;}
+.fill-row{display:grid;gap:.3rem;}
+.fill-row .role{font-weight:700;color:var(--dark-black);}
+.fill-row .where{font-size:.85rem;color:var(--soft-black);}
+.fill-row label{display:flex;gap:.5rem;align-items:center;font-size:.9rem;color:var(--soft-black);flex-wrap:wrap;}
+.fill-row input{flex:1;min-width:180px;padding:.5rem;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-gray);color:var(--dark-black);font:inherit;font-size:.9rem;min-height:40px;}
+.prose-list{margin:1rem 0 1rem 1.25rem;} .prose-list li{margin:.4rem 0;color:var(--soft-black);}
+.sources{margin:1rem 0 1rem 1.25rem;font-size:.9rem;} .sources li{margin:.5rem 0;color:var(--soft-black);}
+.tag{font-size:.7rem;font-weight:700;padding:1px 6px;border-radius:4px;color:#fff;margin-right:4px;}
+.tag.primary{background:var(--primary-green);} .tag.secondary{background:#8a7a3a;}
+.verify-note{font-size:.78rem;color:var(--soft-black);margin-top:1rem;}
+footer.site{text-align:center;margin-top:5rem;color:var(--soft-black);font-size:.85rem;padding:0 1.5rem;}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;}.flip-card-inner{transition:none !important;}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<header class="site"><div class="header-container"><a href="index.html" class="nav-back">&larr; Back to Course Dashboard</a><button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button></div></header>
+<main class="container" id="main">
+<div class="lesson-header"><span class="eyebrow">Day 2 · Advanced Automation Track · Lesson 09</span><h1>Data Extraction &amp; Administration</h1>
+<div class="description-box"><p><strong>Course Target:</strong> Use AI agents and agentic browsers to automate administrative data work — extracting data from documents, assembling reports and forms, and producing compliance reports — with verification, de-identification, and human sign-off so nothing wrong or private goes out.</p><p>Lessons 7–8 built workflows; Lesson 10 connects tools (MCP) and Lesson 11 governs data. This lesson is the practical payoff: automating the repetitive admin tasks — data extraction, form filling, document assembly, compliance reporting — that eat faculty time. The key is an <strong>assembly line</strong> with checkpoints: extract → verify → assemble → sign off → submit.</p></div></div><section aria-labelledby="hook-h"><h2 id="hook-h">Start from your task</h2><div class="callout"><span class="label">A concrete goal for this lesson</span>You file the same report every term — pulling numbers out of a dozen documents and retyping them into a form. By the end you’ll know how to let AI extract, assemble, and draft that report — safely, with a verification step and your sign-off before anything is submitted.</div></section><section aria-labelledby="obj-h"><h2 id="obj-h">Learning Objectives</h2><ul class="objectives-list"><li><strong>Extract</strong> structured data from documents and forms with AI — by writing a clear extraction instruction — and <strong>verify</strong> it against the source before using it.</li><li><strong>Design</strong> a safe document/form "assembly line" — template + data + human checkpoint — for one recurring administrative task.</li><li><strong>Build</strong> an auditable compliance-reporting routine that de-identifies where needed and requires sign-off before submission.</li></ul><div class="callout"><span class="label">A note on what "able to" means here</span>These activities are your first supervised attempts at each skill — a working draft and a repeatable method, not full mastery.</div></section><section aria-labelledby="terms-h"><h2 id="terms-h">Key Terms</h2><p style="font-size:.9rem;color:var(--soft-black);margin-bottom:1rem;">Select any card to flip it. Cards are keyboard-operable — press Enter or Space.</p><div class="terms-grid"><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>Data Extraction</strong><span class="level">Start here</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>Pulling specific fields or values out of unstructured sources (PDFs, emails, forms) into a structured format you can actually use.</p></div></div></button><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>Structured Output</strong><span class="level">Build on it</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>Asking AI to return data in a fixed shape — a table or set of fields — instead of prose, so the result is consistent and easy to check.</p></div></div></button><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>Document Assembly Line</strong><span class="level">Make it work</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>A repeatable pipeline that takes data plus a template and produces a finished document the same way every time — with a checkpoint before it goes out.</p></div></div></button><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>Audit Trail</strong><span class="level">Make it stick</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>A record of what the automation did — inputs, steps, outputs — so a reviewer (or you) can check and defend it later. Essential for compliance.</p></div></div></button></div></section><section aria-labelledby="outline-h"><h2 id="outline-h">Course Outline &amp; Lesson Modules</h2><div class="content-window"><div class="content-tabs" role="tablist" aria-label="Lesson 09 reading sections"><button class="tab-btn" id="tab-0" type="button" role="tab" aria-selected="true" aria-controls="pane-0" tabindex="0">Page 1: Extract &amp; Verify</button><button class="tab-btn" id="tab-1" type="button" role="tab" aria-selected="false" aria-controls="pane-1" tabindex="-1">Page 2: The Assembly Line</button><button class="tab-btn" id="tab-2" type="button" role="tab" aria-selected="false" aria-controls="pane-2" tabindex="-1">Page 3: Compliance, Safely</button></div><div class="content-pane" id="pane-0" role="tabpanel" aria-labelledby="tab-0" tabindex="0"><div class="analogy-box"><strong>If you remember one thing:</strong> AI can pull data out of messy documents fast — but it can mis-read or invent values, so every extraction needs a quick check against the source before you use it.</div><p>The trick to reliable extraction is asking for <strong>structured output</strong>: tell the AI to return a <em>table</em> with named columns (or a fixed set of fields), not a paragraph. Structured results are consistent and easy to verify line by line.</p><h3>A reusable extraction instruction</h3><p>Paste and adapt this — the "not found, don’t infer" rule is what stops the AI from filling gaps with guesses:</p><pre style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.5;background:var(--bg-gray);border:1px solid var(--border-color);border-radius:6px;padding:1rem;overflow:auto;color:var(--dark-black);margin-top:1rem;" aria-label="Reusable extraction-instruction template with placeholders for the fields to pull and a rule to mark missing fields as not found rather than guessing.">Extract these fields into a table: [field 1], [field 2], [field 3].
+One row per record. Keep values exactly as written — do not reformat.
+If a field isn't present, write "not found" — do not infer or guess.
+Return only the table, plus a column noting the source of each row.</pre><h3>How extraction goes wrong</h3><ul><li>a number is mis-read or transposed (23 becomes 32);</li><li>a value lands in the wrong column;</li><li>a field is <strong>invented</strong> that wasn’t in the source;</li><li>an OCR/scan error is copied straight through.</li></ul><p>Verification is the skill: spot-check a few rows against the original. For high-stakes data, check every row.</p><div class="analogy-box"><strong>Worked example:</strong> you ask AI to extract Course, Section, Instructor, and Enrolled from five section records into a table. Before using it, you open two of the source records and confirm the numbers match — and find one where Enrolled was copied from the wrong line.</div><details class="reveal"><summary>Quick check: the AI returns a clean table of 40 rows pulled from a scanned PDF. Use it as-is?</summary><p>No — scans invite OCR errors. Spot-check several rows against the PDF (and every row if the data is consequential) before trusting the table.</p></details></div><div class="content-pane" id="pane-1" role="tabpanel" aria-labelledby="tab-1" tabindex="0" hidden><div class="analogy-box"><strong>If you remember one thing:</strong> Don’t automate one giant step — build an assembly line of small steps with a human checkpoint before anything is submitted or sent.</div><h3>The picture</h3><pre style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.5;background:var(--bg-gray);border:1px solid var(--border-color);border-radius:6px;padding:1rem;overflow:auto;color:var(--dark-black);margin-top:1rem;" aria-label="Assembly-line diagram: source documents flow down through Extract, Verify, Assemble, Sign off, then Submit or Send only after approval.">Source docs
+   |
+   ▼  Extract        (AI pulls the fields)
+   ▼  Verify         (you spot-check against the source)
+   ▼  Assemble       (data + template → draft)
+   ▼  Sign off       (YOU approve)
+   ▼  Submit / Send   (only after approval)</pre><p>Each step does one job, so you can check it. A <strong>template</strong> keeps the output consistent (and easy to verify), and <strong>form filling</strong> by an agentic browser is convenient — but high-risk: never let an agent <em>auto-submit</em> a consequential form. The sign-off step is what keeps a fast pipeline safe.</p><h3>Worked example</h3><p>For a weekly attendance summary: the agent extracts de-identified counts from the LMS export, assembles them into your standard template, and stops. You review and sign off, and only then does it post — the same way every week, with you in control of the one irreversible step.</p><h3>Worked example — filling a form safely</h3><p>An agentic browser fills the term textbook-adoption form from your course list: it enters each field, then <strong>stops at the submit button</strong>. You scan the filled form against your list, fix anything off, and click submit yourself. The agent does the typing; you own the irreversible click.</p><details class="reveal"><summary>Quick check: an agent offers to fill and submit the term enrollment form automatically from your spreadsheet. Let it?</summary><p>Let it fill the form, but not submit. Insert a sign-off step — you review the filled form, then submit. Auto-submitting a consequential form removes your last chance to catch an error.</p></details></div><div class="content-pane" id="pane-2" role="tabpanel" aria-labelledby="tab-2" tabindex="0" hidden><div class="analogy-box"><strong>If you remember one thing:</strong> Automating compliance saves time only if it’s trustworthy — de-identify, keep an audit trail, and require sign-off. Some steps shouldn’t be automated at all.</div><p><strong>Compliance mapping</strong> means matching your data to what a requirement or standard asks for. Automation can draft that mapping, but a person confirms it. Two non-negotiables for compliance work:</p><ul><li><strong>Audit trail</strong> — log the inputs, steps, and outputs so the result is defensible later.</li><li><strong>Human sign-off</strong> — a person approves before anything is filed or submitted.</li></ul><p><strong>What an audit trail looks like</strong> for you: keep the source files, the instruction/prompt you used, the AI’s output, and the date — enough that someone could re-run it and check your work.</p><h3>Decision aid — "Should I automate this task?"</h3><ol><li><strong>Is it repetitive and rule-based</strong> (good to automate) or judgment-heavy (keep a human in it)?</li><li><strong>Does it touch student data?</strong> If yes, de-identify or use an approved tool (Lesson 11).</li><li><strong>Can I verify the output</strong> before it goes out?</li><li><strong>Is there an audit trail</strong> of what the automation did?</li></ol><div class="analogy-box"><strong>Worked example (before/after):</strong> an automation that "auto-submits the enrollment compliance report" — fails: no review, possible errors, possible student PII. Fixed: it <em>drafts</em> the report from de-identified data, logs each step, and waits for your sign-off before submission.</div><details class="reveal"><summary>Quick check: a colleague wants to fully automate "decide which students get a compliance flag and notify them." Automate it?</summary><p>Not end-to-end — flagging students is judgment-heavy and consequential. Automate the data gathering and drafting; keep the decision and the notification behind human review (and FERPA, Lesson 11).</p></details></div></div></section><section aria-labelledby="cc-h"><h2 id="cc-h">Cumulative Check</h2><div class="panel"><p style="color:var(--soft-black);margin:0;">You want to auto-generate and file a term compliance report from course documents. Name one risk at each stage — extract, assemble, submit — and a control.</p><details class="reveal"><summary>Reveal model answer</summary><p><strong>Extract:</strong> mis-read or invented values → verify against the source. <strong>Assemble:</strong> wrong template/merge or student PII included → use a fixed template and de-identify. <strong>Submit:</strong> filing an error or violation → require human sign-off and keep an audit trail before anything is submitted.</p></details></div></section><section aria-labelledby="act-h"><h2 id="act-h">Hands-on Workspace Modules</h2><div class="activities-grid"><div class="activity-card"><div><div class="activity-num">Activity 01</div><h3>Extract &amp; Verify</h3><p>Extract specified fields from a sample document into a table, then verify against the source — and catch the value that’s wrong.</p><ul class="crit"><li>fields extracted into a clean table;</li><li>rows checked against the source;</li><li>the bad value caught and corrected.</li></ul></div><a href="lesson09-act01.html" class="launch-btn">Open Activity 1</a></div><div class="activity-card"><div><div class="activity-num">Activity 02</div><h3>Build the Assembly Line</h3><p>Lay out the steps for a recurring report, mark where the human checkpoint goes, and identify what must be de-identified.</p><ul class="crit"><li>steps in the right order;</li><li>sign-off before submit;</li><li>de-identification identified.</li></ul></div><a href="lesson09-act02.html" class="launch-btn">Open Activity 2</a></div><div class="activity-card"><div><div class="activity-num">Activity 03</div><h3>Compliance Routine Audit</h3><p>Run the "Should I automate this?" aid on a flawed automation, find what’s missing, and redesign it safely.</p><ul class="crit"><li>decision aid applied;</li><li>flaws identified;</li><li>safe redesign with sign-off + audit trail.</li></ul></div><a href="lesson09-act03.html" class="launch-btn">Open Activity 3</a></div></div></section><section aria-labelledby="wrap-h"><h2 id="wrap-h">Wrap-up</h2><div class="callout"><span class="label">Reflect (2 minutes)</span>Pick one recurring report or form you handle. Run the "Should I automate this?" aid on it — which steps could AI do, and where does your sign-off belong?</div><div class="callout"><span class="label">Model what you teach: disclose your AI use</span>When AI helped extract or assemble a document, note it — briefly and plainly. A one-line note is enough.</div><div class="callout"><span class="label">Recap</span>Extract: ask for structured output and verify against the source. Assemble: a small-step assembly line with a template and a sign-off. Compliance: de-identify, keep an audit trail, and never auto-submit consequential work.</div></section><section aria-labelledby="src-h"><h2 id="src-h">Sources &amp; Further Reading</h2><ol class="sources"><li><span class="tag primary">Primary</span> FERPA, 20 U.S.C. § 1232g; U.S. Dept. of Education, Student Privacy Policy Office (studentprivacy.ed.gov) — de-identification and disclosure for any automated student-data work.</li></ol><p class="verify-note">Tool features for extraction and form filling change quickly — verify current capabilities and your institution’s approved tools before relying on them.</p></section></main>
+<footer class="site"><p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p></footer>
+<script>
+(function(){
+  var root=document.documentElement, toggle=document.getElementById('themeToggle');
+  function currentTheme(){var a=root.getAttribute('data-theme');if(a)return a;return (window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}
+  function syncToggle(){var t=currentTheme();toggle.textContent=(t==='dark')?'☀️ Toggle Light Mode':'🌓 Toggle Dark Mode';toggle.setAttribute('aria-pressed',String(t==='dark'));}
+  try{var s=localStorage.getItem('aiac-theme');if(s==='dark'||s==='light')root.setAttribute('data-theme',s);}catch(e){}
+  syncToggle();
+  toggle.addEventListener('click',function(){var n=(currentTheme()==='dark')?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('aiac-theme',n);}catch(e){}syncToggle();});
+  // flip cards
+  document.querySelectorAll('.flip-card').forEach(function(card){card.addEventListener('click',function(){var f=card.classList.toggle('flipped');card.setAttribute('aria-pressed',String(f));});});
+  // tabs
+  var tabs=Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function selectTab(tab){tabs.forEach(function(t){var sel=(t===tab);t.setAttribute('aria-selected',String(sel));t.setAttribute('tabindex',sel?'0':'-1');var p=document.getElementById(t.getAttribute('aria-controls'));if(p)p.hidden=!sel;});}
+  tabs.forEach(function(tab,i){tab.addEventListener('click',function(){selectTab(tab);});
+    tab.addEventListener('keydown',function(e){var idx=i;
+      if(e.key==='ArrowRight'||e.key==='ArrowDown'){idx=(i+1)%tabs.length;}
+      else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){idx=(i-1+tabs.length)%tabs.length;}
+      else if(e.key==='Home'){idx=0;} else if(e.key==='End'){idx=tabs.length-1;} else {return;}
+      e.preventDefault();tabs[idx].focus();selectTab(tabs[idx]);});});
+  // autosave help-card fields
+  document.querySelectorAll('[data-save]').forEach(function(el){var key='aiac-l11-'+el.id;
+    try{var v=localStorage.getItem(key);if(v!==null)el.value=v;}catch(e){}
+    el.addEventListener('input',function(){try{localStorage.setItem(key,el.value);}catch(e){}});});
+})();
+</script>
+</body>
+</html>
