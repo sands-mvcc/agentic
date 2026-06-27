@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Activity 2 of Lesson 05: Build a Perplexity Space (formerly a Collection) and assemble custom instructions that enforce your sourcing standards across every thread.">
+    <title>Activity 2 — Build a Verification Space | Lesson 05</title>
+    <style>
+        :root {
+            --primary-green: #15803d; --light-green: #bbf7d0; --accent-green: #f0fdf4;
+            --dark-black: #111827; --soft-black: #374151; --pure-white: #ffffff;
+            --bg-gray: #f9fafb; --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff; --code-bg: #f3f4f6; --focus-ring: #166534;
+        }
+        [data-theme="dark"] {
+            --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+            --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+            --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+                --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+                --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+        body { font-family: var(--font-family); background: var(--bg-gray);
+            color: var(--dark-black); line-height: 1.6; padding-bottom: 5rem; }
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+            outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+        .skip-link { position: absolute; left: -999px; top: 0; background: var(--primary-green);
+            color: #fff; padding: 0.75rem 1rem; z-index: 100; border-radius: 0 0 6px 0;
+            font-weight: 600; text-decoration: none; }
+        .skip-link:focus { left: 0; }
+        header.site { background: #111827; color: #fff; padding: 2rem;
+            border-bottom: 5px solid var(--primary-green); }
+        .header-container { max-width: 980px; margin: 0 auto; display: flex;
+            justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .nav-back { color: #86efac; text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-back:hover { text-decoration: underline; }
+        .theme-toggle-btn { background: var(--primary-green); color: #fff; border: none;
+            padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;
+            font-size: 0.85rem; min-height: 44px; }
+        .theme-toggle-btn:hover { opacity: 0.9; }
+        .container { max-width: 980px; margin: 2rem auto; padding: 0 1.5rem; }
+        .activity-tag { display: inline-block; font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-green);
+            margin-bottom: 0.75rem; }
+        h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green); padding-left: 1rem; line-height: 1.15; }
+        .lede { background: var(--card-bg); border: 1px solid var(--border-color);
+            padding: 1.5rem; border-radius: 8px; color: var(--soft-black); margin-bottom: 2rem; }
+        .lede strong { color: var(--dark-black); }
+        h2 { font-size: 1.4rem; margin: 2.5rem 0 1.25rem; padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green); color: var(--dark-black); }
+        h3 { color: var(--dark-black); font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+        p { color: var(--soft-black); }
+        .panel { background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; margin-top: 1.25rem; }
+        .progress-wrap { display: flex; align-items: center; gap: 0.75rem; margin: 0.5rem 0 1rem; }
+        progress { width: 100%; height: 14px; }
+        .progress-label { font-size: 0.85rem; font-weight: 600; color: var(--primary-green); white-space: nowrap; }
+        .check-list { list-style: none; }
+        .check-list li { border: 1px solid var(--border-color); border-radius: 6px;
+            margin-bottom: 0.5rem; background: var(--bg-gray); }
+        .check-list label { display: flex; gap: 0.75rem; align-items: flex-start;
+            padding: 0.9rem 1rem; cursor: pointer; min-height: 44px; }
+        .check-list input { margin-top: 0.2rem; width: 1.1rem; height: 1.1rem;
+            accent-color: var(--primary-green); flex-shrink: 0; }
+        .check-list .done { text-decoration: line-through; color: var(--soft-black); opacity: 0.7; }
+        .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+        .field > label, fieldset > legend { font-weight: 600; font-size: 0.95rem; color: var(--dark-black); }
+        .field input[type="text"], .field select { padding: 0.65rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-size: 0.95rem; font-family: inherit; min-height: 44px; }
+        fieldset { border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 1rem 1.2rem 1.2rem; margin-bottom: 1.1rem; }
+        fieldset legend { padding: 0 0.4rem; }
+        .opt { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.5rem 0;
+            min-height: 44px; cursor: pointer; color: var(--soft-black); }
+        .opt input { margin-top: 0.2rem; width: 1.1rem; height: 1.1rem; accent-color: var(--primary-green); flex-shrink: 0; }
+        .btn-primary { background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.75rem 1.3rem; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; min-height: 44px; }
+        .btn-primary:hover { opacity: 0.9; }
+        .prompt-block { position: relative; background: var(--code-bg);
+            border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; margin-top: 1rem; }
+        .prompt-block pre { white-space: pre-wrap; word-break: break-word; font-size: 0.92rem;
+            color: var(--dark-black); font-family: "SFMono-Regular", Menlo, Consolas, monospace; line-height: 1.55; }
+        .copy-btn { margin-top: 0.75rem; background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; min-height: 40px; }
+        .copy-btn:hover { opacity: 0.9; }
+        .copy-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+        textarea { width: 100%; min-height: 110px; padding: 0.8rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-family: inherit; font-size: 0.95rem; resize: vertical; }
+        .save-note { font-size: 0.8rem; color: var(--soft-black); margin-top: 0.5rem; }
+        .callout { background: var(--accent-green); border: 1px solid var(--light-green);
+            border-radius: 8px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; color: var(--dark-black); }
+        [data-theme="dark"] .callout { color: var(--bg-gray); }
+        .callout strong { color: var(--primary-green); }
+        [data-theme="dark"] .callout strong { color: var(--light-green); }
+        .note { background: var(--accent-green); border-left: 4px solid var(--primary-green);
+            padding: 0.9rem 1.2rem; border-radius: 0 6px 6px 0; margin-top: 1rem; color: var(--dark-black); font-size: 0.92rem; }
+        [data-theme="dark"] .note { color: var(--bg-gray); }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        footer.site { text-align: center; margin-top: 5rem; color: var(--soft-black);
+            font-size: 0.85rem; padding: 0 1.5rem; }
+        .nav-foot { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+        .nav-foot a { color: var(--primary-green); font-weight: 600; text-decoration: none;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-foot a:hover { text-decoration: underline; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+        @media (min-width: 620px) { .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; } }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site">
+    <div class="header-container">
+        <a href="lesson05.html" class="nav-back">← Back to Lesson 05</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<main class="container" id="main">
+    <span class="activity-tag">Lesson 05 · Activity 02</span>
+    <h1>Build a Verification Space</h1>
+    <p class="lede">A one-off search forgets your standards the moment it ends. A <strong>Space</strong> — the workspace Perplexity used to call a <em>Collection</em> — remembers them. Here you'll stand up a project Space, give it grounding files, and use the builder below to write <strong>custom instructions</strong> that enforce your sourcing rules in every thread, so you never have to re-type "cite primary sources" again.</p>
+
+    <h2>Set up the Space</h2>
+    <div class="progress-wrap">
+        <progress id="prog" max="5" value="0"></progress>
+        <span class="progress-label" id="progLabel" aria-live="polite">0 of 5 done</span>
+    </div>
+    <ul class="check-list" id="checklist">
+        <li><label><input type="checkbox" data-step><span>In Perplexity, create a new <strong>Space</strong> and give it a clear project name (e.g., "Accreditation Review 2026").</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Use <strong>Add Sources</strong> to upload grounding files (PDFs, CSVs) or pin specific websites the Space should always consider.</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Build your custom instructions with the tool below and paste them into the Space's <strong>Custom Instructions</strong> field.</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Select the AI model for the Space (paid tiers) and, if collaborating, invite colleagues with appropriate permissions.</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Run a test query and confirm the answer obeys your instructions — cited, dated, and drawing on your files.</span></label></li>
+    </ul>
+
+    <h2>Custom-instruction builder</h2>
+    <p>Choose the standards this Space should enforce. Generate the instruction block, then copy it into Perplexity. Your selections are saved on this device.</p>
+    <div class="panel">
+        <div class="field">
+            <label for="proj">Project / Space name</label>
+            <input type="text" id="proj" placeholder="e.g., Gen-Ed Accreditation Review" autocomplete="off">
+        </div>
+        <div class="field">
+            <label for="audience">Who is this research for? (sets tone &amp; reading level)</label>
+            <input type="text" id="audience" placeholder="e.g., a faculty curriculum committee" autocomplete="off">
+        </div>
+
+        <div class="two-col">
+            <div class="field">
+                <label for="sourcePref">Source preference</label>
+                <select id="sourcePref">
+                    <option value="primary">Primary &amp; peer-reviewed only</option>
+                    <option value="prefer">Prefer primary, allow reputable secondary</option>
+                    <option value="any">No restriction, but always disclose source type</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="recency">Recency window</label>
+                <select id="recency">
+                    <option value="1">Published within the last year</option>
+                    <option value="3">Published within the last 3 years</option>
+                    <option value="none">No recency limit, but note the date</option>
+                </select>
+            </div>
+        </div>
+
+        <fieldset>
+            <legend>Integrity rules</legend>
+            <label class="opt"><input type="checkbox" id="r-cite" checked><span>Cite a source for every factual claim.</span></label>
+            <label class="opt"><input type="checkbox" id="r-date" checked><span>Always state each source's publication date.</span></label>
+            <label class="opt"><input type="checkbox" id="r-conflict" checked><span>Flag where sources disagree instead of smoothing it over.</span></label>
+            <label class="opt"><input type="checkbox" id="r-single"><span>Warn me when a claim rests on only one source.</span></label>
+            <label class="opt"><input type="checkbox" id="r-uncertain"><span>Say "I'm not certain" rather than guess when sources are thin.</span></label>
+            <label class="opt"><input type="checkbox" id="r-files"><span>Prioritize my uploaded files; use the web to confirm or update them.</span></label>
+        </fieldset>
+
+        <div class="field">
+            <label for="format">Answer format</label>
+            <select id="format">
+                <option value="bullets">Bulleted findings, each with its citation</option>
+                <option value="brief">Short narrative brief with citations</option>
+                <option value="table">Comparison table with a source column</option>
+            </select>
+        </div>
+
+        <button class="btn-primary" id="generate" type="button">Generate custom instructions</button>
+
+        <div class="prompt-block">
+            <pre id="output">Make your selections above, then choose "Generate custom instructions" to build your instruction block here.</pre>
+            <button class="copy-btn" type="button" id="copyOut" disabled>Copy instructions</button>
+        </div>
+        <p class="note">Paste this into the Space's <strong>Custom Instructions</strong> field — not into a single thread. Instructions set on the Space apply to every question you ask inside it.</p>
+    </div>
+
+    <h2>Reflection</h2>
+    <div class="panel">
+        <label for="reflect" style="font-weight:600; color:var(--dark-black); display:block; margin-bottom:0.5rem;">Which rule will matter most for your work, and what's one task you'll move into this Space first?</label>
+        <textarea id="reflect" placeholder="The rule I most need is… The first task I'll run here is…"></textarea>
+        <p class="save-note">Saved automatically on this device.</p>
+    </div>
+
+    <div class="callout">
+        <strong>Why this holds up:</strong> Standards you have to remember are standards you'll skip under deadline pressure. Encoding them once into a Space makes consistent, cited, dated research the path of least resistance — for you and anyone you invite to collaborate.
+    </div>
+
+    <nav class="nav-foot" aria-label="Activity navigation">
+        <a href="lesson05-act01.html">← Activity 1: Source Validation Lab</a>
+        <a href="lesson05-act03.html">Activity 3: Scheduled Integrity Monitor →</a>
+    </nav>
+
+    <div class="sr-only" id="live" aria-live="polite"></div>
+</main>
+
+<footer class="site">
+    <p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+</footer>
+
+<script>
+    (function () {
+        var STORE = 'aiac-l05-act02-v1';
+        var root = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+        var live = document.getElementById('live');
+
+        function currentTheme() {
+            var attr = root.getAttribute('data-theme');
+            if (attr) return attr;
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        function syncToggle() {
+            var t = currentTheme();
+            toggle.textContent = (t === 'dark') ? '☀️ Toggle Light Mode' : '🌓 Toggle Dark Mode';
+            toggle.setAttribute('aria-pressed', String(t === 'dark'));
+        }
+        try { var s = localStorage.getItem('aiac-theme'); if (s === 'dark' || s === 'light') root.setAttribute('data-theme', s); } catch (e) {}
+        syncToggle();
+        toggle.addEventListener('click', function () {
+            var next = (currentTheme() === 'dark') ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('aiac-theme', next); } catch (e) {}
+            syncToggle();
+        });
+
+        function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+        function save(st) { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) {} }
+        var state = load();
+        state.steps = state.steps || [];
+        state.form = state.form || {};
+        state.reflect = state.reflect || '';
+
+        // checklist
+        var boxes = Array.prototype.slice.call(document.querySelectorAll('[data-step]'));
+        var prog = document.getElementById('prog');
+        var progLabel = document.getElementById('progLabel');
+        function renderProgress() {
+            var done = boxes.filter(function (b) { return b.checked; }).length;
+            prog.value = done; progLabel.textContent = done + ' of ' + boxes.length + ' done';
+        }
+        boxes.forEach(function (b, i) {
+            b.checked = !!state.steps[i];
+            if (b.checked) b.closest('label').querySelector('span').classList.add('done');
+            b.addEventListener('change', function () {
+                state.steps[i] = b.checked;
+                b.closest('label').querySelector('span').classList.toggle('done', b.checked);
+                save(state); renderProgress();
+            });
+        });
+        renderProgress();
+
+        // form fields
+        var fieldIds = ['proj', 'audience', 'sourcePref', 'recency', 'format'];
+        var checkIds = ['r-cite', 'r-date', 'r-conflict', 'r-single', 'r-uncertain', 'r-files'];
+        fieldIds.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (state.form[id] != null) el.value = state.form[id];
+            el.addEventListener('input', function () { state.form[id] = el.value; save(state); });
+            el.addEventListener('change', function () { state.form[id] = el.value; save(state); });
+        });
+        checkIds.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (state.form[id] != null) el.checked = state.form[id];
+            el.addEventListener('change', function () { state.form[id] = el.checked; save(state); });
+        });
+
+        // generator
+        var out = document.getElementById('output');
+        var copyOut = document.getElementById('copyOut');
+        function buildInstructions() {
+            var proj = (document.getElementById('proj').value || 'this project').trim();
+            var aud = document.getElementById('audience').value.trim();
+            var pref = document.getElementById('sourcePref').value;
+            var rec = document.getElementById('recency').value;
+            var fmt = document.getElementById('format').value;
+
+            var lines = [];
+            lines.push('You are the research assistant for "' + proj + '".');
+            if (aud) lines.push('Write for ' + aud + '; match that reading level and tone.');
+
+            if (pref === 'primary') lines.push('Use only primary and peer-reviewed sources. Do not rely on blogs, marketing pages, or undated content.');
+            else if (pref === 'prefer') lines.push('Prefer primary and peer-reviewed sources; reputable secondary sources are acceptable when nothing primary exists. Avoid promotional content.');
+            else lines.push('You may use any source, but always disclose what kind of source each citation is (primary, peer-reviewed, news, blog, etc.).');
+
+            if (rec === '1') lines.push('Prioritize sources published within the last year; note when a key source is older.');
+            else if (rec === '3') lines.push('Prioritize sources from the last three years; note when a key source is older.');
+            else lines.push('There is no recency limit, but always state each source\u2019s publication date.');
+
+            var rules = [];
+            if (document.getElementById('r-cite').checked) rules.push('Cite a source for every factual claim.');
+            if (document.getElementById('r-date').checked) rules.push('State each source\u2019s publication date.');
+            if (document.getElementById('r-conflict').checked) rules.push('When sources disagree, surface the disagreement explicitly rather than averaging it away.');
+            if (document.getElementById('r-single').checked) rules.push('Warn me when a claim is supported by only one source.');
+            if (document.getElementById('r-uncertain').checked) rules.push('If the evidence is thin, say so plainly instead of guessing.');
+            if (document.getElementById('r-files').checked) rules.push('Treat my uploaded files as the primary reference; use the live web to confirm or update them.');
+            if (rules.length) lines.push('Integrity rules: ' + rules.join(' '));
+
+            if (fmt === 'bullets') lines.push('Format answers as bulleted findings, each followed by its citation.');
+            else if (fmt === 'brief') lines.push('Format answers as a short narrative brief with inline citations.');
+            else lines.push('Format answers as a comparison table that includes a dedicated source column.');
+
+            return lines.join('\n');
+        }
+        document.getElementById('generate').addEventListener('click', function () {
+            var text = buildInstructions();
+            out.textContent = text;
+            copyOut.disabled = false;
+            live.textContent = 'Custom instructions generated';
+        });
+        copyOut.addEventListener('click', function () {
+            var text = out.textContent;
+            function ok() { var o = copyOut.textContent; copyOut.textContent = 'Copied ✓'; live.textContent = 'Instructions copied'; setTimeout(function () { copyOut.textContent = o; }, 1500); }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(ok).catch(function () { legacyCopy(text, ok); });
+            } else { legacyCopy(text, ok); }
+        });
+        function legacyCopy(text, cb) {
+            var ta = document.createElement('textarea'); ta.value = text;
+            ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta);
+            ta.select(); try { document.execCommand('copy'); cb(); } catch (e) {} document.body.removeChild(ta);
+        }
+
+        // reflection
+        var reflect = document.getElementById('reflect');
+        reflect.value = state.reflect;
+        var t;
+        reflect.addEventListener('input', function () {
+            clearTimeout(t);
+            t = setTimeout(function () { state.reflect = reflect.value; save(state); }, 400);
+        });
+    })();
+</script>
+</body>
+</html>

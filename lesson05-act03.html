@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Activity 3 of Lesson 05: configure a recurring Perplexity Task to monitor a topic over time, then triangulate findings in a synthesis matrix.">
+    <title>Activity 3 — Scheduled Integrity Monitor | Lesson 05</title>
+    <style>
+        :root {
+            --primary-green: #15803d; --light-green: #bbf7d0; --accent-green: #f0fdf4;
+            --dark-black: #111827; --soft-black: #374151; --pure-white: #ffffff;
+            --bg-gray: #f9fafb; --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff; --code-bg: #f3f4f6; --focus-ring: #166534;
+            --warn: #b45309; --good: #15803d; --bad: #b91c1c;
+        }
+        [data-theme="dark"] {
+            --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+            --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+            --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+            --warn: #fbbf24; --good: #4ade80; --bad: #f87171;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+                --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+                --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+                --warn: #fbbf24; --good: #4ade80; --bad: #f87171;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+        body { font-family: var(--font-family); background: var(--bg-gray);
+            color: var(--dark-black); line-height: 1.6; padding-bottom: 5rem; }
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+            outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+        .skip-link { position: absolute; left: -999px; top: 0; background: var(--primary-green);
+            color: #fff; padding: 0.75rem 1rem; z-index: 100; border-radius: 0 0 6px 0;
+            font-weight: 600; text-decoration: none; }
+        .skip-link:focus { left: 0; }
+        header.site { background: #111827; color: #fff; padding: 2rem;
+            border-bottom: 5px solid var(--primary-green); }
+        .header-container { max-width: 1040px; margin: 0 auto; display: flex;
+            justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .nav-back { color: #86efac; text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-back:hover { text-decoration: underline; }
+        .theme-toggle-btn { background: var(--primary-green); color: #fff; border: none;
+            padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;
+            font-size: 0.85rem; min-height: 44px; }
+        .theme-toggle-btn:hover { opacity: 0.9; }
+        .container { max-width: 1040px; margin: 2rem auto; padding: 0 1.5rem; }
+        .activity-tag { display: inline-block; font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-green); margin-bottom: 0.75rem; }
+        h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green); padding-left: 1rem; line-height: 1.15; }
+        .lede { background: var(--card-bg); border: 1px solid var(--border-color);
+            padding: 1.5rem; border-radius: 8px; color: var(--soft-black); margin-bottom: 2rem; }
+        .lede strong { color: var(--dark-black); }
+        h2 { font-size: 1.4rem; margin: 2.5rem 0 1.25rem; padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green); color: var(--dark-black); }
+        h3 { color: var(--dark-black); font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+        p { color: var(--soft-black); }
+        .panel { background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; margin-top: 1.25rem; }
+        .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+        .field label { font-weight: 600; font-size: 0.95rem; color: var(--dark-black); }
+        .field input[type="text"], .field select { padding: 0.65rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-size: 0.95rem; font-family: inherit; min-height: 44px; }
+        .btn-primary { background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.75rem 1.3rem; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; min-height: 44px; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-ghost { background: transparent; color: var(--primary-green);
+            border: 1px solid var(--primary-green); border-radius: 6px; padding: 0.6rem 1rem;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; min-height: 44px; }
+        .prompt-block { position: relative; background: var(--code-bg);
+            border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; margin-top: 1rem; }
+        .prompt-block pre { white-space: pre-wrap; word-break: break-word; font-size: 0.92rem;
+            color: var(--dark-black); font-family: "SFMono-Regular", Menlo, Consolas, monospace; line-height: 1.55; }
+        .copy-btn { margin-top: 0.75rem; background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; min-height: 40px; }
+        .copy-btn:hover { opacity: 0.9; }
+        .copy-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+        .note { background: var(--accent-green); border-left: 4px solid var(--primary-green);
+            padding: 0.9rem 1.2rem; border-radius: 0 6px 6px 0; margin-top: 1rem; color: var(--dark-black); font-size: 0.92rem; }
+        [data-theme="dark"] .note { color: var(--bg-gray); }
+        /* matrix */
+        .matrix-scroll { overflow-x: auto; margin-top: 1rem; }
+        table.matrix { width: 100%; border-collapse: collapse; min-width: 640px; }
+        table.matrix th, table.matrix td { border: 1px solid var(--border-color);
+            padding: 0.5rem; vertical-align: top; text-align: left; }
+        table.matrix th { background: var(--accent-green); color: var(--dark-black);
+            font-size: 0.85rem; }
+        [data-theme="dark"] table.matrix th { color: var(--bg-gray); }
+        table.matrix td input[type="text"] { width: 100%; border: none; background: transparent;
+            color: var(--dark-black); font-family: inherit; font-size: 0.9rem; padding: 0.35rem; min-height: 38px; }
+        table.matrix td input[type="text"]:focus-visible { outline: 2px solid var(--focus-ring); border-radius: 3px; }
+        table.matrix td select { width: 100%; border: 1px solid var(--border-color); border-radius: 5px;
+            background: var(--bg-gray); color: var(--dark-black); font-family: inherit; font-size: 0.85rem; min-height: 40px; padding: 0.3rem; }
+        .agree-Agree { color: var(--good); font-weight: 700; }
+        .agree-Conflict { color: var(--bad); font-weight: 700; }
+        .agree-Unclear { color: var(--warn); font-weight: 700; }
+        .row-remove { background: none; border: none; color: var(--bad); cursor: pointer;
+            font-size: 1.1rem; min-width: 40px; min-height: 40px; }
+        .matrix-actions { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+        .tally { margin-top: 0.75rem; font-size: 0.88rem; color: var(--soft-black); }
+        textarea { width: 100%; min-height: 110px; padding: 0.8rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-family: inherit; font-size: 0.95rem; resize: vertical; }
+        .save-note { font-size: 0.8rem; color: var(--soft-black); margin-top: 0.5rem; }
+        .callout { background: var(--accent-green); border: 1px solid var(--light-green);
+            border-radius: 8px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; color: var(--dark-black); }
+        [data-theme="dark"] .callout { color: var(--bg-gray); }
+        .callout strong { color: var(--primary-green); }
+        [data-theme="dark"] .callout strong { color: var(--light-green); }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        footer.site { text-align: center; margin-top: 5rem; color: var(--soft-black);
+            font-size: 0.85rem; padding: 0 1.5rem; }
+        .nav-foot { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+        .nav-foot a { color: var(--primary-green); font-weight: 600; text-decoration: none;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-foot a:hover { text-decoration: underline; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+        @media (min-width: 620px) { .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; } }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site">
+    <div class="header-container">
+        <a href="lesson05.html" class="nav-back">← Back to Lesson 05</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<main class="container" id="main">
+    <span class="activity-tag">Lesson 05 · Activity 03</span>
+    <h1>Scheduled Integrity Monitor</h1>
+    <p class="lede">Research goes stale. A figure that was current when you cited it can quietly become wrong. In this activity you'll build a recurring <strong>Task</strong> that re-runs your query on a schedule and delivers a fresh, cited summary — then you'll practice the synthesis step itself, triangulating what multiple sources say in a structured matrix instead of trusting any single one.</p>
+
+    <h2>Part A — Build the recurring Task</h2>
+    <p>Fill in the fields and generate a Task prompt. In Perplexity, create a scheduled Task (a Pro feature) and paste it in.</p>
+    <div class="panel">
+        <div class="field">
+            <label for="topic">Topic to monitor</label>
+            <input type="text" id="topic" placeholder="e.g., changes to federal Title IV financial-aid rules" autocomplete="off">
+        </div>
+        <div class="two-col">
+            <div class="field">
+                <label for="cadence">How often should it run?</label>
+                <select id="cadence">
+                    <option value="daily">Daily</option>
+                    <option value="weekly" selected>Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="window">Only include items from the last…</label>
+                <select id="window">
+                    <option value="3 days">3 days</option>
+                    <option value="7 days" selected>7 days</option>
+                    <option value="30 days">30 days</option>
+                </select>
+            </div>
+        </div>
+        <div class="field">
+            <label for="focus">What should each summary prioritize?</label>
+            <input type="text" id="focus" placeholder="e.g., official rule changes and effective dates, not opinion pieces" autocomplete="off">
+        </div>
+        <button class="btn-primary" id="genTask" type="button">Generate Task prompt</button>
+        <div class="prompt-block">
+            <pre id="taskOut">Fill in the fields above, then choose "Generate Task prompt" to build your scheduled-Task instruction here.</pre>
+            <button class="copy-btn" type="button" id="copyTask" disabled>Copy Task prompt</button>
+        </div>
+        <p class="note">Tasks turn Perplexity from reactive to proactive: it runs on schedule and notifies you when a fresh, cited briefing is ready — so monitoring becomes a maintained record, not a one-time snapshot.</p>
+    </div>
+
+    <h2>Part B — Synthesis matrix</h2>
+    <p>When your Task (or a Deep Research run) returns several sources on one question, don't just take the top answer. Lay the claims side by side. Add a row per claim, note what each source says, and mark whether they agree. The matrix is saved on this device.</p>
+    <div class="panel">
+        <div class="matrix-scroll">
+            <table class="matrix" id="matrix">
+                <thead>
+                    <tr>
+                        <th scope="col" style="min-width:160px;">Claim / question</th>
+                        <th scope="col" style="min-width:150px;">Source A says</th>
+                        <th scope="col" style="min-width:150px;">Source B says</th>
+                        <th scope="col" style="min-width:120px;">Verdict</th>
+                        <th scope="col"><span class="sr-only">Remove row</span></th>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody"></tbody>
+            </table>
+        </div>
+        <div class="matrix-actions">
+            <button class="btn-primary" id="addRow" type="button">Add row</button>
+            <button class="btn-ghost" id="resetMatrix" type="button">Reset matrix</button>
+        </div>
+        <p class="tally" id="tally" aria-live="polite"></p>
+    </div>
+
+    <h2>Synthesis write-up</h2>
+    <div class="panel">
+        <label for="writeup" style="font-weight:600; color:var(--dark-black); display:block; margin-bottom:0.5rem;">In 3–5 sentences, what can you say with confidence, and where do the sources genuinely conflict?</label>
+        <textarea id="writeup" placeholder="Sources agree that… They conflict on… Given that, I would conclude / hold off on…"></textarea>
+        <p class="save-note">Saved automatically on this device.</p>
+    </div>
+
+    <div class="callout">
+        <strong>The integrity payoff:</strong> Agreement across independent sources earns confidence; conflict is a signal to dig, not to pick the convenient answer. A scheduled Task keeps the record current, and the matrix forces the triangulation that turns "the AI said so" into "here's what the evidence shows."
+    </div>
+
+    <nav class="nav-foot" aria-label="Activity navigation">
+        <a href="lesson05-act02.html">← Activity 2: Build a Verification Space</a>
+        <a href="lesson05.html">Back to Lesson 05 overview →</a>
+    </nav>
+
+    <div class="sr-only" id="live" aria-live="polite"></div>
+</main>
+
+<footer class="site">
+    <p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+</footer>
+
+<script>
+    (function () {
+        var STORE = 'aiac-l05-act03-v1';
+        var root = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+        var live = document.getElementById('live');
+
+        function currentTheme() {
+            var attr = root.getAttribute('data-theme');
+            if (attr) return attr;
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        function syncToggle() {
+            var t = currentTheme();
+            toggle.textContent = (t === 'dark') ? '☀️ Toggle Light Mode' : '🌓 Toggle Dark Mode';
+            toggle.setAttribute('aria-pressed', String(t === 'dark'));
+        }
+        try { var s = localStorage.getItem('aiac-theme'); if (s === 'dark' || s === 'light') root.setAttribute('data-theme', s); } catch (e) {}
+        syncToggle();
+        toggle.addEventListener('click', function () {
+            var next = (currentTheme() === 'dark') ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('aiac-theme', next); } catch (e) {}
+            syncToggle();
+        });
+
+        function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+        function save(st) { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) {} }
+        var state = load();
+        state.task = state.task || {};
+        state.rows = state.rows || [];
+        state.writeup = state.writeup || '';
+
+        // ---- Task builder ----
+        var taskFields = ['topic', 'cadence', 'window', 'focus'];
+        taskFields.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (state.task[id] != null) el.value = state.task[id];
+            var ev = (el.tagName === 'SELECT') ? 'change' : 'input';
+            el.addEventListener(ev, function () { state.task[id] = el.value; save(state); });
+        });
+        var taskOut = document.getElementById('taskOut');
+        var copyTask = document.getElementById('copyTask');
+        document.getElementById('genTask').addEventListener('click', function () {
+            var topic = (document.getElementById('topic').value || '[topic]').trim();
+            var cadence = document.getElementById('cadence').value;
+            var win = document.getElementById('window').value;
+            var focus = document.getElementById('focus').value.trim();
+            var lines = [];
+            lines.push('Run this ' + cadence + '. Search the live web for developments about ' + topic + ' from the last ' + win + '.');
+            if (focus) lines.push('Prioritize: ' + focus + '.');
+            lines.push('Return a concise briefing. For every item, cite the source and give its publication date. If a source updates or contradicts an earlier finding, say so explicitly. If nothing significant changed in this window, say that plainly rather than padding the summary.');
+            taskOut.textContent = lines.join('\n');
+            copyTask.disabled = false;
+            live.textContent = 'Task prompt generated';
+        });
+        copyTask.addEventListener('click', function () { copyText(taskOut.textContent, copyTask); });
+
+        function copyText(text, btn) {
+            function ok() { var o = btn.textContent; btn.textContent = 'Copied ✓'; live.textContent = 'Copied to clipboard'; setTimeout(function () { btn.textContent = o; }, 1500); }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(ok).catch(function () { legacyCopy(text, ok); });
+            } else { legacyCopy(text, ok); }
+        }
+        function legacyCopy(text, cb) {
+            var ta = document.createElement('textarea'); ta.value = text;
+            ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta);
+            ta.select(); try { document.execCommand('copy'); cb(); } catch (e) {} document.body.removeChild(ta);
+        }
+
+        // ---- Synthesis matrix ----
+        var body = document.getElementById('matrixBody');
+        var tally = document.getElementById('tally');
+
+        function makeCellInput(value, key, rowIdx) {
+            var inp = document.createElement('input');
+            inp.type = 'text'; inp.value = value || '';
+            inp.addEventListener('input', function () { state.rows[rowIdx][key] = inp.value; save(state); });
+            return inp;
+        }
+        function renderMatrix() {
+            body.innerHTML = '';
+            state.rows.forEach(function (row, idx) {
+                var tr = document.createElement('tr');
+
+                ['claim', 'a', 'b'].forEach(function (key) {
+                    var td = document.createElement('td');
+                    td.appendChild(makeCellInput(row[key], key, idx));
+                    tr.appendChild(td);
+                });
+
+                var tdV = document.createElement('td');
+                var sel = document.createElement('select');
+                ['Unclear', 'Agree', 'Conflict'].forEach(function (opt) {
+                    var o = document.createElement('option'); o.value = opt; o.textContent = opt;
+                    if (row.verdict === opt) o.selected = true;
+                    sel.appendChild(o);
+                });
+                sel.className = 'agree-' + (row.verdict || 'Unclear');
+                sel.addEventListener('change', function () {
+                    state.rows[idx].verdict = sel.value;
+                    sel.className = 'agree-' + sel.value;
+                    save(state); updateTally();
+                });
+                tdV.appendChild(sel); tr.appendChild(tdV);
+
+                var tdR = document.createElement('td');
+                var rm = document.createElement('button');
+                rm.type = 'button'; rm.className = 'row-remove'; rm.textContent = '×';
+                rm.setAttribute('aria-label', 'Remove row ' + (idx + 1));
+                rm.addEventListener('click', function () { state.rows.splice(idx, 1); save(state); renderMatrix(); });
+                tdR.appendChild(rm); tr.appendChild(tdR);
+
+                body.appendChild(tr);
+            });
+            updateTally();
+        }
+        function updateTally() {
+            if (!state.rows.length) { tally.textContent = 'No rows yet. Add a claim to begin triangulating.'; return; }
+            var a = 0, c = 0, u = 0;
+            state.rows.forEach(function (r) {
+                if (r.verdict === 'Agree') a++; else if (r.verdict === 'Conflict') c++; else u++;
+            });
+            tally.textContent = state.rows.length + ' claim(s): ' + a + ' agree · ' + c + ' conflict · ' + u + ' unclear.';
+        }
+        document.getElementById('addRow').addEventListener('click', function () {
+            state.rows.push({ claim: '', a: '', b: '', verdict: 'Unclear' });
+            save(state); renderMatrix();
+            var inputs = body.querySelectorAll('tr:last-child input');
+            if (inputs.length) inputs[0].focus();
+        });
+        document.getElementById('resetMatrix').addEventListener('click', function () {
+            state.rows = []; save(state); renderMatrix(); live.textContent = 'Matrix reset';
+        });
+        if (!state.rows.length) { state.rows.push({ claim: '', a: '', b: '', verdict: 'Unclear' }); }
+        renderMatrix();
+
+        // ---- write-up ----
+        var writeup = document.getElementById('writeup');
+        writeup.value = state.writeup;
+        var t;
+        writeup.addEventListener('input', function () {
+            clearTimeout(t);
+            t = setTimeout(function () { state.writeup = writeup.value; save(state); }, 400);
+        });
+    })();
+</script>
+</body>
+</html>

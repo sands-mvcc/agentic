@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Lesson 05 of Mastering AI Automation: using Perplexity as a verification agent — live grounding, inline citations, Spaces (formerly Collections), and source-integrity workflows for faculty.">
+    <title>Lesson 05: Information Synthesis with Perplexity</title>
+    <style>
+        :root {
+            --primary-green: #15803d;
+            --light-green: #bbf7d0;
+            --accent-green: #f0fdf4;
+            --dark-black: #111827;
+            --soft-black: #374151;
+            --pure-white: #ffffff;
+            --bg-gray: #f9fafb;
+            --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff;
+            --code-bg: #f3f4f6;
+            --focus-ring: #166534;
+        }
+
+        [data-theme="dark"] {
+            --bg-gray: #111827;
+            --dark-black: #f9fafb;
+            --soft-black: #d1d5db;
+            --pure-white: #1f2937;
+            --card-bg: #1f2937;
+            --border-color: #374151;
+            --accent-green: #14532d;
+            --light-green: #4ade80;
+            --code-bg: #0f172a;
+            --focus-ring: #4ade80;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-gray: #111827;
+                --dark-black: #f9fafb;
+                --soft-black: #d1d5db;
+                --pure-white: #1f2937;
+                --card-bg: #1f2937;
+                --border-color: #374151;
+                --accent-green: #14532d;
+                --light-green: #4ade80;
+                --code-bg: #0f172a;
+                --focus-ring: #4ade80;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-gray);
+            color: var(--dark-black);
+            line-height: 1.6;
+            padding-bottom: 5rem;
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: 0;
+            background: var(--primary-green);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            z-index: 100;
+            border-radius: 0 0 6px 0;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .skip-link:focus {
+            left: 0;
+        }
+
+        header.site {
+            background-color: #111827;
+            color: #ffffff;
+            padding: 2rem;
+            border-bottom: 5px solid var(--primary-green);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-back {
+            color: #86efac;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .nav-back:hover {
+            text-decoration: underline;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-height: 44px;
+        }
+
+        .theme-toggle-btn:hover {
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .lesson-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--primary-green);
+            margin-bottom: 0.75rem;
+        }
+
+        .lesson-header h1 {
+            font-size: clamp(1.9rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green);
+            padding-left: 1rem;
+            line-height: 1.15;
+        }
+
+        .description-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .description-box p {
+            margin-bottom: 1rem;
+            color: var(--soft-black);
+        }
+        .description-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1.25rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green);
+            color: var(--dark-black);
+        }
+
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            color: var(--soft-black);
+        }
+
+        .objectives-list li::before {
+            content: "✓";
+            color: var(--primary-green);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .terms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            perspective: 1000px;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            text-align: inherit;
+            display: block;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            min-height: 150px;
+            display: grid;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            grid-area: 1 / 1;
+            width: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .flip-card-front {
+            background-color: var(--card-bg);
+            color: var(--dark-black);
+            border-bottom: 4px solid var(--primary-green);
+        }
+
+        .flip-card-front strong {
+            font-size: 1.1rem;
+        }
+
+        .flip-card-front .level {
+            font-size: 0.75rem;
+            color: var(--primary-green);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .flip-card-front .hint {
+            font-size: 0.7rem;
+            color: var(--soft-black);
+            margin-top: 0.75rem;
+        }
+
+        .flip-card-back {
+            background-color: var(--dark-black);
+            color: var(--bg-gray);
+            transform: rotateY(180deg);
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+        [data-theme="dark"] .flip-card-back {
+            background-color: #0b1220;
+            color: #e5e7eb;
+        }
+
+        .content-window {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+
+        .content-tabs {
+            display: flex;
+            background-color: rgba(0,0,0,0.03);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        [data-theme="dark"] .content-tabs {
+            background-color: rgba(255,255,255,0.04);
+        }
+
+        .tab-btn {
+            flex: 1 1 180px;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--soft-black);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-size: 0.95rem;
+            min-height: 44px;
+            font-family: inherit;
+        }
+
+        .tab-btn[aria-selected="true"] {
+            color: var(--primary-green);
+            border-bottom-color: var(--primary-green);
+            background-color: var(--card-bg);
+        }
+
+        .content-pane {
+            padding: 2rem;
+        }
+        .content-pane[hidden] {
+            display: none;
+        }
+
+        .content-pane h3 {
+            color: var(--dark-black);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+        }
+        .content-pane h3:first-child {
+            margin-top: 0;
+        }
+
+        .content-pane p {
+            margin-top: 1rem;
+            color: var(--soft-black);
+        }
+
+        .analogy-box {
+            background-color: var(--accent-green);
+            border-left: 4px solid var(--primary-green);
+            padding: 1rem 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            color: var(--dark-black);
+        }
+        [data-theme="dark"] .analogy-box { color: var(--bg-gray); }
+
+        .inline-cite {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.25rem;
+            height: 1.25rem;
+            padding: 0 0.3rem;
+            margin: 0 0.1rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 4px;
+            background: var(--primary-green);
+            color: #fff;
+            vertical-align: super;
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .activity-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--dark-black);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .activity-card:hover {
+            border-color: var(--primary-green);
+        }
+
+        .activity-num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            color: var(--dark-black);
+        }
+
+        .activity-card p {
+            font-size: 0.9rem;
+            color: var(--soft-black);
+            margin-bottom: 1.5rem;
+        }
+
+        .launch-btn {
+            background-color: var(--primary-green);
+            color: white;
+            text-decoration: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .launch-btn:hover {
+            opacity: 0.9;
+        }
+
+        .callout {
+            background: var(--accent-green);
+            border: 1px solid var(--light-green);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-top: 1.5rem;
+            color: var(--dark-black);
+        }
+        [data-theme="dark"] .callout { color: var(--bg-gray); }
+        .callout strong { color: var(--primary-green); }
+        [data-theme="dark"] .callout strong { color: var(--light-green); }
+
+        footer.site {
+            text-align: center;
+            margin-top: 5rem;
+            color: var(--soft-black);
+            font-size: 0.85rem;
+            padding: 0 1.5rem;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+            .flip-card-inner { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site">
+    <div class="header-container">
+        <a href="index.html" class="nav-back">← Back to Course Dashboard</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<main class="container" id="main">
+    <div class="lesson-header">
+        <span class="eyebrow">Day 1 · Research Track · Lesson 05</span>
+        <h1>Information Synthesis with Perplexity</h1>
+        <div class="description-box">
+            <p><strong>Course Target:</strong> Deploy Perplexity as a deep verification agent — using live, cited search and persistent <em>Spaces</em> (the feature formerly called Collections) to synthesize trustworthy answers from many sources at once.</p>
+            <p>Unlike a model that answers from memory alone, Perplexity grounds every response in the live web and attaches numbered citations you can click through and check. In this lesson, faculty learn to treat that citation trail as the product — not a footnote — and to build reusable, project-scoped workspaces that keep research organized, current, and defensible for academic and administrative use.</p>
+        </div>
+    </div>
+
+    <section aria-labelledby="obj-h">
+        <h2 id="obj-h">Learning Objectives</h2>
+        <ul class="objectives-list">
+            <li>Distinguish grounded, cited search from ungrounded text generation, and explain why traceable sources matter for academic integrity.</li>
+            <li>Evaluate the quality of sources Perplexity returns using a repeatable validation rubric rather than accepting answers at face value.</li>
+            <li>Build a Perplexity <strong>Space</strong> with custom instructions and uploaded files to create a persistent, project-aware research workspace.</li>
+            <li>Configure recurring verification with scheduled Tasks and synthesize multi-source findings into a defensible summary.</li>
+        </ul>
+    </section>
+
+    <section aria-labelledby="terms-h">
+        <h2 id="terms-h">Key Terms</h2>
+        <p style="font-size:0.9rem; color:var(--soft-black); margin-bottom: 1rem;">Select any card to flip it and reveal the definition. Cards are keyboard-operable — press Enter or Space.</p>
+        <div class="terms-grid">
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>Grounded Generation</strong>
+                        <span class="level">Sonar Engine</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>Answers built from documents retrieved live from the web at query time, rather than from the model's frozen training data — so results stay current and can be traced to a source.</p>
+                    </div>
+                </div>
+            </button>
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>Inline Citation</strong>
+                        <span class="level">Verification</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>The numbered markers [1][2][3] beside each claim. Each links to the source URL, title, and supporting snippet — the trail you click through to confirm a claim is real.</p>
+                    </div>
+                </div>
+            </button>
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>Spaces</strong>
+                        <span class="level">Formerly "Collections"</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>Persistent, shareable research hubs that combine your uploaded files with live web search, hold custom AI instructions, and keep every thread for a project in one place. Old Collections were auto-converted to Spaces.</p>
+                    </div>
+                </div>
+            </button>
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>Pro Search &amp; Deep Research</strong>
+                        <span class="level">Multi-step</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>Modes that run a multi-step plan, read hundreds of sources, ask clarifying follow-ups, and assemble a structured, cited report — built for questions a single quick answer can't cover.</p>
+                    </div>
+                </div>
+            </button>
+
+        </div>
+    </section>
+
+    <section aria-labelledby="outline-h">
+        <h2 id="outline-h">Course Outline &amp; Lesson Modules</h2>
+        <div class="content-window">
+            <div class="content-tabs" role="tablist" aria-label="Lesson 05 reading sections">
+                <button class="tab-btn" id="tab-0" type="button" role="tab" aria-selected="true" aria-controls="pane-0" tabindex="0">Page 1: Search That Cites Itself</button>
+                <button class="tab-btn" id="tab-1" type="button" role="tab" aria-selected="false" aria-controls="pane-1" tabindex="-1">Page 2: Spaces as Memory</button>
+                <button class="tab-btn" id="tab-2" type="button" role="tab" aria-selected="false" aria-controls="pane-2" tabindex="-1">Page 3: Verification &amp; Integrity</button>
+            </div>
+
+            <div class="content-pane" id="pane-0" role="tabpanel" aria-labelledby="tab-0" tabindex="0">
+                <h3>Why grounding changes the job</h3>
+                <p>A standard language model answers from patterns learned during training. It is fluent, but it cannot tell you <em>where</em> a fact came from, and it can state something false with complete confidence. Perplexity inverts the default: every query first searches the live web, then writes an answer <em>from</em> the retrieved pages, attaching a numbered citation<span class="inline-cite">1</span> to each claim.</p>
+                <p>For an educator, this shifts the work. The skill is no longer crafting one perfect prompt — it is reading the citation trail critically. A cited answer is an invitation to verify, not a guarantee of truth. The numbers point you at sources; whether those sources are any good is your call to make.</p>
+                <div class="analogy-box">
+                    <strong>Conceptual analogy:</strong> An ungrounded chatbot is a confident colleague recounting something from memory. Perplexity is a research assistant who hands you the answer <em>with the stack of articles it pulled from</em> — so you can check the assistant's work before you put your name on it.
+                </div>
+                <h3>What "multi-source synthesis" really means</h3>
+                <p>Pro Search and Deep Research read across many pages and reconcile them into one response. The value is not speed alone — it is triangulation. When three independent sources agree, confidence rises; when they conflict, the disagreement itself is the finding, and it surfaces in the citations rather than getting averaged away into a smooth, false consensus.</p>
+            </div>
+
+            <div class="content-pane" id="pane-1" role="tabpanel" aria-labelledby="tab-1" tabindex="0" hidden>
+                <h3>From scattered threads to a project workspace</h3>
+                <p>A <strong>Space</strong> (the feature Perplexity previously called a <em>Collection</em>) is a persistent home for one project. Where a normal thread is an ephemeral, one-off chat, a Space holds many threads, the files you upload, and a set of standing instructions — so the assistant stays aware of your project across every question you ask inside it.</p>
+                <p>Three capabilities make Spaces the heart of this lesson:</p>
+                <p><strong>1. Files + web together.</strong> Add PDFs, CSVs, or specific websites as a grounding set. Queries can then draw on <em>both</em> your uploaded documents and the live web in a single answer — your department syllabus and the current accreditation standard, side by side.</p>
+                <p><strong>2. Custom instructions that persist.</strong> Set a standing rule once — for example, "prioritize peer-reviewed and primary sources" or "always note the publication date" — and it applies to every thread in that Space, so you stop re-typing your standards.</p>
+                <p><strong>3. Access and privacy controls.</strong> Invite collaborators with managed permissions. On Enterprise Pro tiers, files and queries inside a Space are excluded from model training by default — relevant when handling sensitive institutional material.</p>
+                <h3>Practical example</h3>
+                <p>An instructor builds a Space called "Gen-Ed Accreditation Review," uploads the program's three core syllabi, sets a custom instruction to flag any claim lacking a primary source, and then asks it to compare each syllabus against the current regional standard pulled live from the web — every answer cited and kept in one reviewable place.</p>
+            </div>
+
+            <div class="content-pane" id="pane-2" role="tabpanel" aria-labelledby="tab-2" tabindex="0" hidden>
+                <h3>Treating citations as evidence, not decoration</h3>
+                <p>Integrity work begins where the citation ends. A disciplined validation pass asks of each cited source: <em>Who published it, when, with what expertise, and to what end?</em> A confident-sounding answer propped up by a marketing blog and an undated forum post is weaker than a cautious one resting on a government dataset and a peer-reviewed study.</p>
+                <p>Watch for the failure modes specific to cited AI search: a citation that supports a <em>nearby</em> claim but not the exact sentence it's attached to; several "sources" that all trace back to one original; and recency mismatches where last year's figure is quietly presented as current.</p>
+                <h3>Keeping research current with scheduled Tasks</h3>
+                <p>Perplexity can run a saved query on a schedule — daily, weekly, or monthly — and notify you with a fresh, cited summary. For an educator monitoring an evolving policy or an emerging topic in their field, a scheduled Task turns one-time research into a maintained, dated record rather than a snapshot that silently goes stale.</p>
+                <div class="callout">
+                    <strong>Integrity guardrail:</strong> The goal of this lesson is not to outsource judgment to the tool. Perplexity accelerates gathering and triangulation; the educator still owns the final call on whether a source is credible and a claim is true. Click through. Verify before you cite.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section aria-labelledby="act-h">
+        <h2 id="act-h">Hands-on Workspace Modules</h2>
+        <div class="activities-grid">
+
+            <div class="activity-card">
+                <div>
+                    <div class="activity-num">Activity 01</div>
+                    <h3>Source Validation Lab</h3>
+                    <p>Run a Pro Search query, then click through and score every citation it returns using a repeatable credibility rubric — and decide whether the answer is defensible.</p>
+                </div>
+                <a href="lesson05-act01.html" class="launch-btn">Open Activity 1</a>
+            </div>
+
+            <div class="activity-card">
+                <div>
+                    <div class="activity-num">Activity 02</div>
+                    <h3>Build a Verification Space</h3>
+                    <p>Create a project Space (formerly Collection), upload grounding files, and assemble custom instructions that lock in your sourcing standards across every thread.</p>
+                </div>
+                <a href="lesson05-act02.html" class="launch-btn">Open Activity 2</a>
+            </div>
+
+            <div class="activity-card">
+                <div>
+                    <div class="activity-num">Activity 03</div>
+                    <h3>Scheduled Integrity Monitor</h3>
+                    <p>Configure a recurring Task to track a topic over time, then synthesize the findings across sources in a structured agreement-and-conflict matrix.</p>
+                </div>
+                <a href="lesson05-act03.html" class="launch-btn">Open Activity 3</a>
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<footer class="site">
+    <p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+</footer>
+
+<script>
+    (function () {
+        // ---- Theme handling: respects system preference, persists choice ----
+        var root = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+
+        function currentTheme() {
+            var attr = root.getAttribute('data-theme');
+            if (attr) return attr;
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        function syncToggle() {
+            var t = currentTheme();
+            toggle.textContent = (t === 'dark') ? '☀️ Toggle Light Mode' : '🌓 Toggle Dark Mode';
+            toggle.setAttribute('aria-pressed', String(t === 'dark'));
+        }
+        try {
+            var saved = localStorage.getItem('aiac-theme');
+            if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+        } catch (e) {}
+        syncToggle();
+
+        toggle.addEventListener('click', function () {
+            var next = (currentTheme() === 'dark') ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('aiac-theme', next); } catch (e) {}
+            syncToggle();
+        });
+
+        // ---- Flip cards (keyboard + click) ----
+        var cards = document.querySelectorAll('.flip-card');
+        cards.forEach(function (card) {
+            card.addEventListener('click', function () {
+                var flipped = card.classList.toggle('flipped');
+                card.setAttribute('aria-pressed', String(flipped));
+            });
+        });
+
+        // ---- Tabs with roving tabindex + arrow-key navigation ----
+        var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+        function selectTab(tab) {
+            tabs.forEach(function (t) {
+                var selected = (t === tab);
+                t.setAttribute('aria-selected', String(selected));
+                t.setAttribute('tabindex', selected ? '0' : '-1');
+                var pane = document.getElementById(t.getAttribute('aria-controls'));
+                if (pane) pane.hidden = !selected;
+            });
+        }
+        tabs.forEach(function (tab, i) {
+            tab.addEventListener('click', function () { selectTab(tab); });
+            tab.addEventListener('keydown', function (e) {
+                var idx = i;
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { idx = (i + 1) % tabs.length; }
+                else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { idx = (i - 1 + tabs.length) % tabs.length; }
+                else if (e.key === 'Home') { idx = 0; }
+                else if (e.key === 'End') { idx = tabs.length - 1; }
+                else { return; }
+                e.preventDefault();
+                tabs[idx].focus();
+                selectTab(tabs[idx]);
+            });
+        });
+    })();
+</script>
+</body>
+</html>

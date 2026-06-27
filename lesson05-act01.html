@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Activity 1 of Lesson 05: Source Validation Lab — run a Pro Search query and score every citation with a repeatable credibility rubric.">
+    <title>Activity 1 — Source Validation Lab | Lesson 05</title>
+    <style>
+        :root {
+            --primary-green: #15803d;
+            --light-green: #bbf7d0;
+            --accent-green: #f0fdf4;
+            --dark-black: #111827;
+            --soft-black: #374151;
+            --pure-white: #ffffff;
+            --bg-gray: #f9fafb;
+            --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff;
+            --code-bg: #f3f4f6;
+            --focus-ring: #166534;
+            --warn: #b45309;
+            --good: #15803d;
+            --bad: #b91c1c;
+        }
+        [data-theme="dark"] {
+            --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+            --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+            --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a;
+            --focus-ring: #4ade80; --warn: #fbbf24; --good: #4ade80; --bad: #f87171;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+                --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+                --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a;
+                --focus-ring: #4ade80; --warn: #fbbf24; --good: #4ade80; --bad: #f87171;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+        body { font-family: var(--font-family); background: var(--bg-gray);
+            color: var(--dark-black); line-height: 1.6; padding-bottom: 5rem; }
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+            outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+        .skip-link { position: absolute; left: -999px; top: 0; background: var(--primary-green);
+            color: #fff; padding: 0.75rem 1rem; z-index: 100; border-radius: 0 0 6px 0;
+            font-weight: 600; text-decoration: none; }
+        .skip-link:focus { left: 0; }
+        header.site { background: #111827; color: #fff; padding: 2rem;
+            border-bottom: 5px solid var(--primary-green); }
+        .header-container { max-width: 980px; margin: 0 auto; display: flex;
+            justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .nav-back { color: #86efac; text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-back:hover { text-decoration: underline; }
+        .theme-toggle-btn { background: var(--primary-green); color: #fff; border: none;
+            padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;
+            font-size: 0.85rem; min-height: 44px; }
+        .theme-toggle-btn:hover { opacity: 0.9; }
+        .container { max-width: 980px; margin: 2rem auto; padding: 0 1.5rem; }
+        .activity-tag { display: inline-block; font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-green);
+            margin-bottom: 0.75rem; }
+        h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green); padding-left: 1rem; line-height: 1.15; }
+        .lede { background: var(--card-bg); border: 1px solid var(--border-color);
+            padding: 1.5rem; border-radius: 8px; color: var(--soft-black); margin-bottom: 2rem; }
+        h2 { font-size: 1.4rem; margin: 2.5rem 0 1.25rem; padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green); color: var(--dark-black); }
+        h3 { color: var(--dark-black); font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+        p { color: var(--soft-black); }
+        .panel { background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; margin-top: 1.25rem; }
+        /* progress + checklist */
+        .progress-wrap { display: flex; align-items: center; gap: 0.75rem; margin: 0.5rem 0 1rem; }
+        progress { width: 100%; height: 14px; }
+        .progress-label { font-size: 0.85rem; font-weight: 600; color: var(--primary-green);
+            white-space: nowrap; }
+        .check-list { list-style: none; }
+        .check-list li { border: 1px solid var(--border-color); border-radius: 6px;
+            margin-bottom: 0.5rem; background: var(--bg-gray); }
+        .check-list label { display: flex; gap: 0.75rem; align-items: flex-start;
+            padding: 0.9rem 1rem; cursor: pointer; min-height: 44px; }
+        .check-list input { margin-top: 0.2rem; width: 1.1rem; height: 1.1rem;
+            accent-color: var(--primary-green); flex-shrink: 0; }
+        .check-list .done { text-decoration: line-through; color: var(--soft-black); opacity: 0.7; }
+        /* prompt blocks */
+        .prompt-block { position: relative; background: var(--code-bg);
+            border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem 1rem 1rem;
+            margin-top: 0.75rem; }
+        .prompt-block pre { white-space: pre-wrap; word-break: break-word; font-size: 0.9rem;
+            color: var(--dark-black); font-family: "SFMono-Regular", Menlo, Consolas, monospace; }
+        .copy-btn { margin-top: 0.75rem; background: var(--primary-green); color: #fff;
+            border: none; border-radius: 6px; padding: 0.45rem 0.9rem; font-weight: 600;
+            font-size: 0.82rem; cursor: pointer; min-height: 36px; }
+        .copy-btn:hover { opacity: 0.9; }
+        /* scorer */
+        .scorer-grid { display: grid; grid-template-columns: 1fr; gap: 0.85rem; }
+        .field { display: flex; flex-direction: column; gap: 0.35rem; }
+        .field label { font-weight: 600; font-size: 0.9rem; color: var(--dark-black); }
+        .field input[type="text"], .field select { padding: 0.6rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-size: 0.95rem; font-family: inherit; min-height: 44px; }
+        .rubric-row { display: grid; grid-template-columns: 1fr auto; gap: 0.75rem;
+            align-items: center; }
+        .rubric-row select { min-width: 7.5rem; }
+        .btn-primary { background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.7rem 1.2rem; font-weight: 700; font-size: 0.92rem;
+            cursor: pointer; min-height: 44px; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-ghost { background: transparent; color: var(--primary-green);
+            border: 1px solid var(--primary-green); border-radius: 6px; padding: 0.6rem 1rem;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; min-height: 44px; }
+        .scored-list { list-style: none; margin-top: 1rem; }
+        .scored-item { display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem; border: 1px solid var(--border-color); border-left-width: 5px;
+            border-radius: 6px; padding: 0.85rem 1rem; margin-bottom: 0.6rem; background: var(--bg-gray); }
+        .scored-item .name { font-weight: 600; color: var(--dark-black); word-break: break-word; }
+        .scored-item .meta { font-size: 0.8rem; color: var(--soft-black); }
+        .verdict { font-weight: 700; font-size: 0.85rem; white-space: nowrap; }
+        .v-good { color: var(--good); } .v-mid { color: var(--warn); } .v-bad { color: var(--bad); }
+        .b-good { border-left-color: var(--good); }
+        .b-mid { border-left-color: var(--warn); }
+        .b-bad { border-left-color: var(--bad); }
+        .remove-btn { background: none; border: none; color: var(--bad); cursor: pointer;
+            font-size: 1.1rem; min-width: 44px; min-height: 44px; }
+        textarea { width: 100%; min-height: 120px; padding: 0.8rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-family: inherit; font-size: 0.95rem; resize: vertical; }
+        .save-note { font-size: 0.8rem; color: var(--soft-black); margin-top: 0.5rem; }
+        .callout { background: var(--accent-green); border: 1px solid var(--light-green);
+            border-radius: 8px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; color: var(--dark-black); }
+        [data-theme="dark"] .callout { color: var(--bg-gray); }
+        .callout strong { color: var(--primary-green); }
+        [data-theme="dark"] .callout strong { color: var(--light-green); }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        footer.site { text-align: center; margin-top: 5rem; color: var(--soft-black);
+            font-size: 0.85rem; padding: 0 1.5rem; }
+        .nav-foot { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2.5rem;
+            flex-wrap: wrap; }
+        .nav-foot a { color: var(--primary-green); font-weight: 600; text-decoration: none;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-foot a:hover { text-decoration: underline; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+        @media (min-width: 620px) { .scorer-grid { grid-template-columns: 1fr 1fr; }
+            .field.full { grid-column: 1 / -1; } }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site">
+    <div class="header-container">
+        <a href="lesson05.html" class="nav-back">← Back to Lesson 05</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<main class="container" id="main">
+    <span class="activity-tag">Lesson 05 · Activity 01</span>
+    <h1>Source Validation Lab</h1>
+    <p class="lede">A cited answer is only as trustworthy as the sources behind it. In this lab you'll run a real Pro Search query in Perplexity, then click through and score <strong>every</strong> citation against a four-part credibility rubric — and decide whether the answer is something you'd be willing to stand behind in front of colleagues or students.</p>
+
+    <h2>Step-by-step</h2>
+    <p>Work through these in Perplexity (free tier includes a few Pro Searches per day). Check each box as you go — your progress is saved on this device.</p>
+    <div class="progress-wrap">
+        <progress id="prog" max="6" value="0"></progress>
+        <span class="progress-label" id="progLabel" aria-live="polite">0 of 6 done</span>
+    </div>
+    <ul class="check-list" id="checklist">
+        <li><label><input type="checkbox" data-step><span>Open Perplexity and switch the search mode to <strong>Pro Search</strong>.</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Run a factual query in your field that has a verifiable answer (use a template below, or your own).</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Read the answer and note every claim that carries a numbered citation.</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Click each citation. Confirm the linked page actually supports the exact sentence it's attached to.</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Score each source below using the credibility rubric.</span></label></li>
+        <li><label><input type="checkbox" data-step><span>Write your verdict: would you cite this answer as-is, revise it, or reject it?</span></label></li>
+    </ul>
+
+    <h2>Starter queries</h2>
+    <p>Pick one and adapt it to your discipline. The point is a question with a checkable answer — not an opinion.</p>
+    <div class="panel">
+        <h3>Template A — a current standard or figure</h3>
+        <div class="prompt-block">
+            <pre id="qA">What is the current credit-hour definition used by my regional accreditor, and when was it last revised? Cite the primary source for each claim and note the publication date.</pre>
+            <button class="copy-btn" type="button" data-copy="#qA">Copy query</button>
+        </div>
+        <h3>Template B — a contested claim worth triangulating</h3>
+        <div class="prompt-block">
+            <pre id="qB">Summarize the current research consensus on [a debated topic in my field]. For each point, cite at least two independent sources and flag where the sources disagree.</pre>
+            <button class="copy-btn" type="button" data-copy="#qB">Copy query</button>
+        </div>
+    </div>
+
+    <h2>Credibility scorer</h2>
+    <p>For each source the answer cites, rate the four factors, then add it to your list. Scores are saved on this device until you reset.</p>
+    <div class="panel">
+        <div class="scorer-grid">
+            <div class="field full">
+                <label for="srcName">Source name or URL</label>
+                <input type="text" id="srcName" placeholder="e.g., dept-of-ed.gov standards page" autocomplete="off">
+            </div>
+            <div class="field">
+                <label for="curr">Currency — is it recent / dated?</label>
+                <div class="rubric-row">
+                    <span class="meta">How current</span>
+                    <select id="curr">
+                        <option value="3">Dated &amp; current</option>
+                        <option value="2">Undated but plausible</option>
+                        <option value="1">Outdated / unknown</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label for="auth">Authority — who published it?</label>
+                <div class="rubric-row">
+                    <span class="meta">Publisher</span>
+                    <select id="auth">
+                        <option value="3">Primary / official / peer-reviewed</option>
+                        <option value="2">Reputable secondary</option>
+                        <option value="1">Unknown / promotional</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label for="acc">Accuracy — does it support the claim?</label>
+                <div class="rubric-row">
+                    <span class="meta">Support</span>
+                    <select id="acc">
+                        <option value="3">Directly supports the sentence</option>
+                        <option value="2">Supports a nearby claim</option>
+                        <option value="1">Doesn't really support it</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label for="purp">Purpose — why does it exist?</label>
+                <div class="rubric-row">
+                    <span class="meta">Intent</span>
+                    <select id="purp">
+                        <option value="3">Inform / document</option>
+                        <option value="2">Mixed</option>
+                        <option value="1">Sell / persuade</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field full">
+                <button class="btn-primary" id="addSrc" type="button">Add scored source</button>
+            </div>
+        </div>
+        <ul class="scored-list" id="scoredList" aria-live="polite"></ul>
+        <div id="summary" class="meta" style="margin-top:0.5rem;"></div>
+        <button class="btn-ghost" id="resetScores" type="button" style="margin-top:1rem;">Reset scores</button>
+    </div>
+
+    <h2>Your verdict</h2>
+    <div class="panel">
+        <label for="verdict" style="font-weight:600; color:var(--dark-black); display:block; margin-bottom:0.5rem;">Would you cite this answer as-is, revise it, or reject it — and why?</label>
+        <textarea id="verdict" placeholder="The strongest source was… The weakest was… I would [cite / revise / reject] because…"></textarea>
+        <p class="save-note" id="verdictSaved">Saved automatically on this device.</p>
+    </div>
+
+    <div class="callout">
+        <strong>Takeaway:</strong> A source that scores 10–12 is solid; 7–9 needs a second source before you rely on it; 4–6 should not anchor a claim on its own. The citation got you to the door — the rubric decides whether you walk through it.
+    </div>
+
+    <nav class="nav-foot" aria-label="Activity navigation">
+        <a href="lesson05.html">← Lesson 05 overview</a>
+        <a href="lesson05-act02.html">Activity 2: Build a Verification Space →</a>
+    </nav>
+
+    <div class="sr-only" id="live" aria-live="polite"></div>
+</main>
+
+<footer class="site">
+    <p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+</footer>
+
+<script>
+    (function () {
+        var STORE = 'aiac-l05-act01-v1';
+        var root = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+        var live = document.getElementById('live');
+
+        function currentTheme() {
+            var attr = root.getAttribute('data-theme');
+            if (attr) return attr;
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        function syncToggle() {
+            var t = currentTheme();
+            toggle.textContent = (t === 'dark') ? '☀️ Toggle Light Mode' : '🌓 Toggle Dark Mode';
+            toggle.setAttribute('aria-pressed', String(t === 'dark'));
+        }
+        try { var s = localStorage.getItem('aiac-theme'); if (s === 'dark' || s === 'light') root.setAttribute('data-theme', s); } catch (e) {}
+        syncToggle();
+        toggle.addEventListener('click', function () {
+            var next = (currentTheme() === 'dark') ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('aiac-theme', next); } catch (e) {}
+            syncToggle();
+        });
+
+        // ---- state ----
+        function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+        function save(st) { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) {} }
+        var state = load();
+        state.steps = state.steps || [];
+        state.sources = state.sources || [];
+        state.verdict = state.verdict || '';
+
+        // ---- checklist ----
+        var boxes = Array.prototype.slice.call(document.querySelectorAll('[data-step]'));
+        var prog = document.getElementById('prog');
+        var progLabel = document.getElementById('progLabel');
+        function renderProgress() {
+            var done = boxes.filter(function (b) { return b.checked; }).length;
+            prog.value = done;
+            progLabel.textContent = done + ' of ' + boxes.length + ' done';
+        }
+        boxes.forEach(function (b, i) {
+            b.checked = !!state.steps[i];
+            if (b.checked) b.closest('label').querySelector('span').classList.add('done');
+            b.addEventListener('change', function () {
+                state.steps[i] = b.checked;
+                b.closest('label').querySelector('span').classList.toggle('done', b.checked);
+                save(state); renderProgress();
+            });
+        });
+        renderProgress();
+
+        // ---- copy buttons ----
+        document.querySelectorAll('.copy-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var el = document.querySelector(btn.getAttribute('data-copy'));
+                var text = el ? el.textContent : '';
+                function ok() { var orig = btn.textContent; btn.textContent = 'Copied ✓'; live.textContent = 'Query copied to clipboard'; setTimeout(function () { btn.textContent = orig; }, 1500); }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(ok).catch(function () { legacyCopy(text, ok); });
+                } else { legacyCopy(text, ok); }
+            });
+        });
+        function legacyCopy(text, cb) {
+            var ta = document.createElement('textarea'); ta.value = text;
+            ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta);
+            ta.select(); try { document.execCommand('copy'); cb(); } catch (e) {} document.body.removeChild(ta);
+        }
+
+        // ---- scorer ----
+        var list = document.getElementById('scoredList');
+        var summary = document.getElementById('summary');
+        function verdictFor(total) {
+            if (total >= 10) return { label: 'Solid (' + total + '/12)', cls: 'v-good', b: 'b-good' };
+            if (total >= 7) return { label: 'Verify further (' + total + '/12)', cls: 'v-mid', b: 'b-mid' };
+            return { label: 'Weak (' + total + '/12)', cls: 'v-bad', b: 'b-bad' };
+        }
+        function renderSources() {
+            list.innerHTML = '';
+            state.sources.forEach(function (src, idx) {
+                var total = src.curr + src.auth + src.acc + src.purp;
+                var v = verdictFor(total);
+                var li = document.createElement('li');
+                li.className = 'scored-item ' + v.b;
+                var info = document.createElement('div');
+                var nm = document.createElement('div'); nm.className = 'name'; nm.textContent = src.name;
+                var mt = document.createElement('div'); mt.className = 'meta';
+                mt.textContent = 'Currency ' + src.curr + ' · Authority ' + src.auth + ' · Accuracy ' + src.acc + ' · Purpose ' + src.purp;
+                info.appendChild(nm); info.appendChild(mt);
+                var right = document.createElement('div');
+                right.style.display = 'flex'; right.style.alignItems = 'center'; right.style.gap = '0.5rem';
+                var vd = document.createElement('span'); vd.className = 'verdict ' + v.cls; vd.textContent = v.label;
+                var rm = document.createElement('button'); rm.className = 'remove-btn'; rm.type = 'button';
+                rm.setAttribute('aria-label', 'Remove ' + src.name); rm.textContent = '×';
+                rm.addEventListener('click', function () { state.sources.splice(idx, 1); save(state); renderSources(); });
+                right.appendChild(vd); right.appendChild(rm);
+                li.appendChild(info); li.appendChild(right);
+                list.appendChild(li);
+            });
+            if (state.sources.length) {
+                var avg = state.sources.reduce(function (s, x) { return s + x.curr + x.auth + x.acc + x.purp; }, 0) / state.sources.length;
+                summary.textContent = state.sources.length + ' source(s) scored · average ' + avg.toFixed(1) + '/12';
+            } else { summary.textContent = 'No sources scored yet.'; }
+        }
+        document.getElementById('addSrc').addEventListener('click', function () {
+            var name = document.getElementById('srcName').value.trim();
+            if (!name) { live.textContent = 'Enter a source name first'; document.getElementById('srcName').focus(); return; }
+            state.sources.push({
+                name: name,
+                curr: parseInt(document.getElementById('curr').value, 10),
+                auth: parseInt(document.getElementById('auth').value, 10),
+                acc: parseInt(document.getElementById('acc').value, 10),
+                purp: parseInt(document.getElementById('purp').value, 10)
+            });
+            save(state); renderSources();
+            document.getElementById('srcName').value = '';
+            live.textContent = 'Source added';
+            document.getElementById('srcName').focus();
+        });
+        document.getElementById('resetScores').addEventListener('click', function () {
+            state.sources = []; save(state); renderSources(); live.textContent = 'Scores reset';
+        });
+        renderSources();
+
+        // ---- verdict notes ----
+        var verdict = document.getElementById('verdict');
+        verdict.value = state.verdict;
+        var t;
+        verdict.addEventListener('input', function () {
+            clearTimeout(t);
+            t = setTimeout(function () { state.verdict = verdict.value; save(state); }, 400);
+        });
+    })();
+</script>
+</body>
+</html>
