@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Activity 3 of Lesson 07: Engine Selector & Pre-Flight Check — answer a few questions to find a fitting agentic browser (Comet, Atlas, or Auto-Browse), then run the safety checklist every delegation should pass first.">
+    <title>Activity 3 — Engine Selector &amp; Pre-Flight Check | Lesson 07</title>
+    <style>
+        :root {
+            --primary-green: #15803d; --light-green: #bbf7d0; --accent-green: #f0fdf4;
+            --dark-black: #111827; --soft-black: #374151; --pure-white: #ffffff;
+            --bg-gray: #f9fafb; --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff; --code-bg: #f3f4f6; --focus-ring: #166534;
+            --warn: #b45309; --warn-bg: #fffbeb;
+        }
+        [data-theme="dark"] {
+            --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+            --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+            --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+            --warn: #fbbf24; --warn-bg: #2a2010;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+                --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+                --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+                --warn: #fbbf24; --warn-bg: #2a2010;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+        body { font-family: var(--font-family); background: var(--bg-gray);
+            color: var(--dark-black); line-height: 1.6; padding-bottom: 5rem; }
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+            outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+        .skip-link { position: absolute; left: -999px; top: 0; background: var(--primary-green);
+            color: #fff; padding: 0.75rem 1rem; z-index: 100; border-radius: 0 0 6px 0;
+            font-weight: 600; text-decoration: none; }
+        .skip-link:focus { left: 0; }
+        header.site { background: #111827; color: #fff; padding: 2rem;
+            border-bottom: 5px solid var(--primary-green); }
+        .header-container { max-width: 900px; margin: 0 auto; display: flex;
+            justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .nav-back { color: #86efac; text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-back:hover { text-decoration: underline; }
+        .theme-toggle-btn { background: var(--primary-green); color: #fff; border: none;
+            padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;
+            font-size: 0.85rem; min-height: 44px; }
+        .theme-toggle-btn:hover { opacity: 0.9; }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+        .activity-tag { display: inline-block; font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-green);
+            margin-bottom: 0.75rem; }
+        h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green); padding-left: 1rem; line-height: 1.15; }
+        .lede { background: var(--card-bg); border: 1px solid var(--border-color);
+            padding: 1.5rem; border-radius: 8px; color: var(--soft-black); margin-bottom: 1.5rem; }
+        .lede strong { color: var(--dark-black); }
+        h2 { font-size: 1.4rem; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green); color: var(--dark-black); }
+        p { color: var(--soft-black); }
+        .panel { background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; margin-top: 1.25rem; }
+        fieldset { border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 1rem 1.2rem 1.2rem; margin-bottom: 1.1rem; }
+        fieldset legend { padding: 0 0.4rem; font-weight: 600; font-size: 0.98rem; color: var(--dark-black); }
+        .opt { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.45rem 0;
+            min-height: 44px; cursor: pointer; color: var(--soft-black); font-size: 0.95rem; }
+        .opt input { margin-top: 0.2rem; width: 1.1rem; height: 1.1rem; accent-color: var(--primary-green); flex-shrink: 0; }
+        .btn-primary { background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.75rem 1.3rem; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; min-height: 44px; }
+        .btn-primary:hover { opacity: 0.9; }
+        .rec { background: var(--accent-green); border: 1px solid var(--light-green);
+            border-radius: 8px; padding: 1.3rem 1.5rem; margin-top: 1.25rem; color: var(--dark-black); }
+        [data-theme="dark"] .rec { color: var(--bg-gray); }
+        .rec .pick { font-size: 1.3rem; font-weight: 800; color: var(--primary-green); margin-bottom: 0.3rem; }
+        [data-theme="dark"] .rec .pick { color: var(--light-green); }
+        .rec ul { margin: 0.6rem 0 0 1.1rem; }
+        .rec li { margin-bottom: 0.3rem; font-size: 0.92rem; }
+        .rec .neutral { font-size: 0.85rem; margin-top: 0.8rem; font-style: italic; }
+        .warnbox { background: var(--warn-bg); border: 1px solid var(--warn);
+            border-left: 4px solid var(--warn); border-radius: 0 6px 6px 0; padding: 0.9rem 1.1rem;
+            margin-top: 0.9rem; font-size: 0.9rem; color: var(--dark-black); }
+        .warnbox strong { color: var(--warn); }
+        .progress-wrap { display: flex; align-items: center; gap: 0.75rem; margin: 0.5rem 0 1rem; }
+        progress { width: 100%; height: 14px; }
+        .progress-label { font-size: 0.85rem; font-weight: 600; color: var(--primary-green); white-space: nowrap; }
+        .check-list { list-style: none; }
+        .check-list li { border: 1px solid var(--border-color); border-radius: 6px;
+            margin-bottom: 0.5rem; background: var(--bg-gray); }
+        .check-list label { display: flex; gap: 0.75rem; align-items: flex-start;
+            padding: 0.9rem 1rem; cursor: pointer; min-height: 44px; }
+        .check-list input { margin-top: 0.2rem; width: 1.1rem; height: 1.1rem;
+            accent-color: var(--primary-green); flex-shrink: 0; }
+        .check-list .done { text-decoration: line-through; color: var(--soft-black); opacity: 0.7; }
+        .ready { font-weight: 700; color: var(--primary-green); margin-top: 0.75rem; }
+        textarea.reflect { width: 100%; min-height: 110px; padding: 0.8rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-family: inherit; font-size: 0.95rem; resize: vertical; }
+        .save-note { font-size: 0.8rem; color: var(--soft-black); margin-top: 0.5rem; }
+        .callout { background: var(--accent-green); border: 1px solid var(--light-green);
+            border-radius: 8px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; color: var(--dark-black); }
+        [data-theme="dark"] .callout { color: var(--bg-gray); }
+        .callout strong { color: var(--primary-green); }
+        [data-theme="dark"] .callout strong { color: var(--light-green); }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        footer.site { text-align: center; margin-top: 5rem; color: var(--soft-black);
+            font-size: 0.85rem; padding: 0 1.5rem; }
+        .nav-foot { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+        .nav-foot a { color: var(--primary-green); font-weight: 600; text-decoration: none;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-foot a:hover { text-decoration: underline; }
+        .hidden { display: none; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site">
+    <div class="header-container">
+        <a href="lesson07.html" class="nav-back">← Back to Lesson 07</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<main class="container" id="main">
+    <span class="activity-tag">Lesson 07 · Activity 03</span>
+    <h1>Engine Selector &amp; Pre-Flight Check</h1>
+    <p class="lede">Two questions sit between you and a useful delegation: <strong>which</strong> agentic browser fits this task, and <strong>should you</strong> hand it over at all. Part one suggests an engine from what you have and what you're doing. Part two is the pre-flight checklist every delegation should clear before the browser is allowed to act. None of this replaces your judgment — it structures it.</p>
+
+    <h2>Part 1 — Which engine fits?</h2>
+    <div class="panel">
+        <fieldset>
+            <legend>Your computer</legend>
+            <label class="opt"><input type="radio" name="platform" value="mac"><span>macOS</span></label>
+            <label class="opt"><input type="radio" name="platform" value="win"><span>Windows</span></label>
+            <label class="opt"><input type="radio" name="platform" value="either"><span>Either / not a constraint</span></label>
+        </fieldset>
+        <fieldset>
+            <legend>What you can already access</legend>
+            <label class="opt"><input type="radio" name="sub" value="perplexity"><span>Perplexity (free or paid)</span></label>
+            <label class="opt"><input type="radio" name="sub" value="chatgpt"><span>ChatGPT Plus / Pro / Business</span></label>
+            <label class="opt"><input type="radio" name="sub" value="google"><span>Google AI Pro / Ultra</span></label>
+            <label class="opt"><input type="radio" name="sub" value="none"><span>Not sure / none yet</span></label>
+        </fieldset>
+        <fieldset>
+            <legend>The task is mostly…</legend>
+            <label class="opt"><input type="radio" name="task" value="research"><span>Research &amp; comparison across many sites</span></label>
+            <label class="opt"><input type="radio" name="task" value="screen"><span>Working from what's on my screen — questions, drafting, rewriting</span></label>
+            <label class="opt"><input type="radio" name="task" value="workspace"><span>Living inside Google Workspace — Gmail, Docs, Drive, Calendar</span></label>
+        </fieldset>
+        <fieldset>
+            <legend>Data sensitivity</legend>
+            <label class="opt"><input type="radio" name="sens" value="public"><span>Public info only — no sign-in needed</span></label>
+            <label class="opt"><input type="radio" name="sens" value="login"><span>Logged-in, but nothing sensitive</span></label>
+            <label class="opt"><input type="radio" name="sens" value="sensitive"><span>Touches student or other personal records</span></label>
+        </fieldset>
+
+        <button class="btn-primary" id="recommend" type="button">Suggest an engine</button>
+        <div class="rec hidden" id="recBox" tabindex="-1" aria-live="polite"></div>
+    </div>
+
+    <h2>Part 2 — Pre-flight checklist</h2>
+    <p>Every box should be checked before you let any agent act. Progress is saved on this device.</p>
+    <div class="progress-wrap">
+        <progress id="prog" max="6" value="0"></progress>
+        <span class="progress-label" id="progLabel" aria-live="polite">0 of 6 cleared</span>
+    </div>
+    <ul class="check-list" id="checklist">
+        <li><label><input type="checkbox" data-step><span><strong>Bounded goal:</strong> one task, a clear finish line, written down.</span></label></li>
+        <li><label><input type="checkbox" data-step><span><strong>No sensitive data:</strong> nothing touching student records (FERPA) or other personal data is exposed to the agent.</span></label></li>
+        <li><label><input type="checkbox" data-step><span><strong>Lowest privilege:</strong> running logged-out or in a low-access session wherever the task allows.</span></label></li>
+        <li><label><input type="checkbox" data-step><span><strong>Stop-points named:</strong> buy, send, submit, log in, and accept-terms all require my approval.</span></label></li>
+        <li><label><input type="checkbox" data-step><span><strong>Active supervision:</strong> I'll watch it run and can interrupt — I'm not walking away mid-task.</span></label></li>
+        <li><label><input type="checkbox" data-step><span><strong>Verify, don't trust:</strong> I'll check the result against the real pages, not just the agent's summary.</span></label></li>
+    </ul>
+    <p class="ready hidden" id="ready">All clear for takeoff — this task is scoped to delegate safely.</p>
+
+    <h2>Reflection</h2>
+    <div class="panel">
+        <label for="reflect" style="font-weight:600; color:var(--dark-black); display:block; margin-bottom:0.5rem;">Think of one task you'd genuinely delegate this week. Which checklist item is hardest to satisfy for it — and does that change whether you'd hand it over?</label>
+        <textarea id="reflect" class="reflect" placeholder="The task is… The hardest box to check is… So I'll either…"></textarea>
+        <p class="save-note">Saved automatically on this device.</p>
+    </div>
+
+    <div class="callout">
+        <strong>The honest default:</strong> If a task can't clear the checklist — especially the sensitive-data and supervision boxes — the right move isn't a different engine, it's to do it yourself. Agentic browsers earn their keep on bounded, low-stakes, public-web work. Keep the high-stakes, student-facing work in your own hands.
+    </div>
+
+    <nav class="nav-foot" aria-label="Activity navigation">
+        <a href="lesson07-act02.html">← Activity 2: Spot the Prompt Injection</a>
+        <a href="lesson07.html">Back to Lesson 07 overview →</a>
+    </nav>
+
+    <div class="sr-only" id="live" aria-live="polite"></div>
+</main>
+
+<footer class="site">
+    <p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+</footer>
+
+<script>
+    (function () {
+        var STORE = 'aiac-l07-act03-v1';
+        var root = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+        var live = document.getElementById('live');
+
+        function currentTheme() {
+            var attr = root.getAttribute('data-theme');
+            if (attr) return attr;
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        function syncToggle() {
+            var t = currentTheme();
+            toggle.textContent = (t === 'dark') ? '☀️ Toggle Light Mode' : '🌓 Toggle Dark Mode';
+            toggle.setAttribute('aria-pressed', String(t === 'dark'));
+        }
+        try { var s = localStorage.getItem('aiac-theme'); if (s === 'dark' || s === 'light') root.setAttribute('data-theme', s); } catch (e) {}
+        syncToggle();
+        toggle.addEventListener('click', function () {
+            var next = (currentTheme() === 'dark') ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('aiac-theme', next); } catch (e) {}
+            syncToggle();
+        });
+
+        function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+        function save(st) { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) {} }
+        var state = load();
+        state.steps = state.steps || [];
+        state.reflect = state.reflect || '';
+
+        // ---- Part 1: recommendation ----
+        var ENGINES = {
+            comet: 'Comet (Perplexity)',
+            atlas: 'ChatGPT Atlas (OpenAI)',
+            auto: 'Auto-Browse (Gemini in Chrome)'
+        };
+        function val(name) {
+            var el = document.querySelector('input[name="' + name + '"]:checked');
+            return el ? el.value : null;
+        }
+        var recBox = document.getElementById('recBox');
+        document.getElementById('recommend').addEventListener('click', function () {
+            var platform = val('platform'), sub = val('sub'), task = val('task'), sens = val('sens');
+            if (!platform || !sub || !task || !sens) {
+                recBox.classList.remove('hidden');
+                recBox.innerHTML = '';
+                var p = document.createElement('p');
+                p.textContent = 'Pick one option in each of the four groups above, then try again.';
+                recBox.appendChild(p);
+                recBox.focus();
+                return;
+            }
+
+            var score = { comet: 0, atlas: 0, auto: 0 };
+            var reasons = [];
+
+            // task fit
+            if (task === 'research') { score.comet += 2; reasons.push('Cross-site research with cited answers is Comet\u2019s home turf.'); }
+            if (task === 'screen') { score.atlas += 2; reasons.push('Atlas shines when the work flows from what\u2019s already on your screen.'); }
+            if (task === 'workspace') { score.auto += 2; reasons.push('Auto-Browse can pull in Gmail, Calendar, and Drive through Connected Apps.'); }
+
+            // subscription (you can only use what you have)
+            if (sub === 'perplexity') { score.comet += 2; }
+            if (sub === 'chatgpt') { score.atlas += 2; reasons.push('Agent mode in Atlas needs a ChatGPT Plus, Pro, or Business plan \u2014 which you have.'); }
+            if (sub === 'google') { score.auto += 2; reasons.push('Auto-Browse is offered to Google AI Pro / Ultra subscribers \u2014 which you have.'); }
+            if (sub === 'none') { score.comet += 2; reasons.push('Comet is free to download and a sensible no-cost starting point.'); }
+
+            // platform
+            if (platform === 'win') { score.comet += 1; reasons.push('On Windows, Comet runs natively today; Atlas began on macOS with other platforms announced.'); }
+            if (platform === 'mac') { score.atlas += 1; }
+            if (platform === 'either') { score.comet += 1; }
+
+            // sensitivity nudge toward the most controllable default
+            if (sens === 'public') { score.comet += 1; }
+
+            // pick winner with tie-break order comet > atlas > auto
+            var order = ['comet', 'atlas', 'auto'];
+            var best = order[0];
+            order.forEach(function (k) { if (score[k] > score[best]) best = k; });
+
+            recBox.classList.remove('hidden');
+            recBox.innerHTML = '';
+
+            var pick = document.createElement('div');
+            pick.className = 'pick';
+            pick.textContent = 'Suggested: ' + ENGINES[best];
+            recBox.appendChild(pick);
+
+            var ul = document.createElement('ul');
+            // keep the two or three most relevant reasons
+            var shown = reasons.slice(0, 3);
+            if (!shown.length) shown = ['Based on your answers, this is the most accessible fit.'];
+            shown.forEach(function (r) {
+                var li = document.createElement('li');
+                li.textContent = r;
+                ul.appendChild(li);
+            });
+            recBox.appendChild(ul);
+
+            // platform caveat
+            if (best === 'atlas' && platform === 'win') {
+                var w = document.createElement('div');
+                w.className = 'warnbox';
+                w.innerHTML = '<strong>Heads up:</strong> Atlas launched on macOS first. Confirm a Windows build is available to you, or use Comet for this task in the meantime.';
+                recBox.appendChild(w);
+            }
+
+            // sensitivity override warning
+            if (sens === 'sensitive') {
+                var s2 = document.createElement('div');
+                s2.className = 'warnbox';
+                s2.innerHTML = '<strong>Reconsider delegating.</strong> No agentic browser should touch student or personal records \u2014 the agent acts inside your logged-in session and can be misdirected by page content. Do the sensitive parts yourself, and only delegate clearly public, non-sensitive steps.';
+                recBox.appendChild(s2);
+            }
+
+            var n = document.createElement('p');
+            n.className = 'neutral';
+            n.textContent = 'A suggestion, not an endorsement \u2014 the right tool is the one you can access and actively supervise. Product availability and features change quickly; verify before you rely on them.';
+            recBox.appendChild(n);
+
+            recBox.focus();
+            live.textContent = 'Suggested engine: ' + ENGINES[best];
+        });
+
+        // ---- Part 2: checklist ----
+        var boxes = Array.prototype.slice.call(document.querySelectorAll('[data-step]'));
+        var prog = document.getElementById('prog');
+        var progLabel = document.getElementById('progLabel');
+        var ready = document.getElementById('ready');
+        function renderProgress() {
+            var done = boxes.filter(function (b) { return b.checked; }).length;
+            prog.value = done;
+            progLabel.textContent = done + ' of ' + boxes.length + ' cleared';
+            ready.classList.toggle('hidden', done !== boxes.length);
+        }
+        boxes.forEach(function (b, i) {
+            b.checked = !!state.steps[i];
+            if (b.checked) b.closest('label').querySelector('span').classList.add('done');
+            b.addEventListener('change', function () {
+                state.steps[i] = b.checked;
+                b.closest('label').querySelector('span').classList.toggle('done', b.checked);
+                save(state); renderProgress();
+            });
+        });
+        renderProgress();
+
+        // ---- Reflection ----
+        var reflect = document.getElementById('reflect');
+        reflect.value = state.reflect;
+        var t;
+        reflect.addEventListener('input', function () {
+            clearTimeout(t);
+            t = setTimeout(function () { state.reflect = reflect.value; save(state); }, 400);
+        });
+    })();
+</script>
+</body>
+</html>
