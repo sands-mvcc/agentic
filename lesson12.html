@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 12 of Mastering AI Automation — the capstone: design, draft, guardrail, and present an end-to-end AI automation pipeline for an academic-administration bottleneck, with peer optimization. For faculty.">
+<title>Lesson 12: Deploying Your Agentic Workflow</title>
+<style>
+:root{--primary-green:#15803d;--light-green:#bbf7d0;--accent-green:#f0fdf4;--dark-black:#111827;
+--soft-black:#374151;--pure-white:#ffffff;--bg-gray:#f9fafb;--border-color:#e5e7eb;
+--font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--card-bg:#ffffff;--code-bg:#f3f4f6;--focus-ring:#166534;}
+[data-theme="dark"]{--bg-gray:#111827;--dark-black:#f9fafb;--soft-black:#d1d5db;--pure-white:#1f2937;
+--card-bg:#1f2937;--border-color:#374151;--accent-green:#14532d;--light-green:#4ade80;--code-bg:#0f172a;--focus-ring:#4ade80;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg-gray:#111827;--dark-black:#f9fafb;
+--soft-black:#d1d5db;--pure-white:#1f2937;--card-bg:#1f2937;--border-color:#374151;--accent-green:#14532d;
+--light-green:#4ade80;--code-bg:#0f172a;--focus-ring:#4ade80;}}
+*{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s ease,color .2s ease,border-color .2s ease;}
+body{font-family:var(--font-family);background-color:var(--bg-gray);color:var(--dark-black);line-height:1.6;padding-bottom:5rem;}
+a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px;border-radius:4px;}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--primary-green);color:#fff;padding:.75rem 1rem;z-index:100;border-radius:0 0 6px 0;font-weight:600;text-decoration:none;}
+.skip-link:focus{left:0;}
+header.site{background-color:#111827;color:#fff;padding:2rem;border-bottom:5px solid var(--primary-green);}
+.header-container{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+.nav-back{color:#86efac;text-decoration:none;font-weight:600;font-size:.95rem;min-height:44px;display:inline-flex;align-items:center;}
+.nav-back:hover{text-decoration:underline;}
+.theme-toggle-btn{background-color:var(--primary-green);color:#fff;border:none;padding:.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;font-size:.85rem;min-height:44px;}
+.theme-toggle-btn:hover{opacity:.9;}
+.container{max-width:1100px;margin:2rem auto;padding:0 1.5rem;}
+.lesson-header{margin-bottom:2.5rem;}
+.eyebrow{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--primary-green);margin-bottom:.75rem;}
+.lesson-header h1{font-size:clamp(1.9rem,4vw,2.5rem);font-weight:800;margin-bottom:1rem;border-left:6px solid var(--primary-green);padding-left:1rem;line-height:1.15;}
+.description-box{background-color:var(--card-bg);border:1px solid var(--border-color);padding:1.5rem;border-radius:8px;margin-bottom:2rem;}
+.description-box p{margin-bottom:1rem;color:var(--soft-black);} .description-box p:last-child{margin-bottom:0;}
+h2{font-size:1.5rem;margin:2.5rem 0 1.25rem;padding-bottom:.5rem;border-bottom:2px solid var(--primary-green);color:var(--dark-black);}
+.objectives-list{list-style:none;}
+.objectives-list li{background:var(--card-bg);border:1px solid var(--border-color);padding:1rem 1rem 1rem 2.5rem;margin-bottom:.5rem;border-radius:6px;position:relative;color:var(--soft-black);}
+.objectives-list li::before{content:"\2713";color:var(--primary-green);font-weight:bold;position:absolute;left:1rem;top:1rem;}
+.terms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-top:1rem;}
+.flip-card{background-color:transparent;width:100%;height:210px;perspective:1000px;cursor:pointer;border:none;padding:0;font-family:inherit;text-align:inherit;display:block;}
+.flip-card-inner{position:relative;width:100%;height:100%;text-align:center;transition:transform .6s;transform-style:preserve-3d;}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg);}
+.flip-card-front,.flip-card-back{position:absolute;inset:0;width:100%;height:100%;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:8px;border:1px solid var(--border-color);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem;overflow:auto;}
+.flip-card-front{background-color:var(--card-bg);color:var(--dark-black);border-bottom:4px solid var(--primary-green);}
+.flip-card-front strong{font-size:1.1rem;}
+.flip-card-front .level{font-size:.75rem;color:var(--primary-green);margin-top:.5rem;text-transform:uppercase;letter-spacing:.05em;}
+.flip-card-front .hint{font-size:.7rem;color:var(--soft-black);margin-top:.75rem;}
+.flip-card-back{background-color:var(--dark-black);color:var(--bg-gray);transform:rotateY(180deg);font-size:.88rem;line-height:1.45;}
+[data-theme="dark"] .flip-card-back{background-color:#0b1220;color:#e5e7eb;}
+.content-window{background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;overflow:hidden;margin-top:1.5rem;}
+.content-tabs{display:flex;background-color:rgba(0,0,0,.03);border-bottom:1px solid var(--border-color);flex-wrap:wrap;}
+[data-theme="dark"] .content-tabs{background-color:rgba(255,255,255,.04);}
+.tab-btn{flex:1 1 180px;padding:1rem;background:none;border:none;font-weight:600;color:var(--soft-black);cursor:pointer;border-bottom:3px solid transparent;font-size:.95rem;min-height:44px;font-family:inherit;}
+.tab-btn[aria-selected="true"]{color:var(--primary-green);border-bottom-color:var(--primary-green);background-color:var(--card-bg);}
+.content-pane{padding:2rem;} .content-pane[hidden]{display:none;}
+.content-pane h3{color:var(--dark-black);font-size:1.2rem;margin-top:1.5rem;} .content-pane h3:first-child{margin-top:0;}
+.content-pane p{margin-top:1rem;color:var(--soft-black);}
+.content-pane ul,.content-pane ol{margin:1rem 0 1rem 1.5rem;} .content-pane li{margin:.4rem 0;color:var(--soft-black);}
+.analogy-box{background-color:var(--accent-green);border-left:4px solid var(--primary-green);padding:1rem 1.5rem;margin-top:1.5rem;border-radius:0 6px 6px 0;color:var(--dark-black);}
+[data-theme="dark"] .analogy-box{color:var(--bg-gray);}
+.analogy-box strong{color:var(--primary-green);} [data-theme="dark"] .analogy-box strong{color:var(--light-green);}
+.data-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1.25rem;}
+.data-table caption{text-align:left;font-size:.78rem;color:var(--soft-black);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em;}
+.data-table th,.data-table td{border:1px solid var(--border-color);padding:.6rem .75rem;text-align:left;vertical-align:top;color:var(--soft-black);}
+.data-table thead th{background:var(--accent-green);color:var(--dark-black);font-weight:700;} [data-theme="dark"] .data-table thead th{color:var(--bg-gray);}
+details.reveal{border:1px solid var(--border-color);border-radius:8px;background:var(--card-bg);padding:1rem 1.25rem;margin-top:1.25rem;}
+details.reveal>summary{cursor:pointer;font-weight:700;color:var(--primary-green);list-style:none;}
+details.reveal>summary::-webkit-details-marker{display:none;}
+details.reveal>summary::before{content:"\25B8  ";}
+details.reveal[open]>summary::before{content:"\25BE  ";}
+details.reveal[open]>summary{margin-bottom:.75rem;}
+details.reveal p{color:var(--soft-black);margin-top:.5rem;}
+.activities-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;}
+.activity-card{background-color:var(--card-bg);border:1px solid var(--border-color);border-top:4px solid var(--dark-black);border-radius:8px;padding:1.5rem;display:flex;flex-direction:column;justify-content:space-between;}
+.activity-card:hover{border-color:var(--primary-green);}
+.activity-num{font-size:.8rem;font-weight:700;color:var(--primary-green);text-transform:uppercase;margin-bottom:.5rem;letter-spacing:.05em;}
+.activity-card h3{font-size:1.2rem;margin-bottom:.75rem;color:var(--dark-black);}
+.activity-card p{font-size:.9rem;color:var(--soft-black);margin-bottom:1.5rem;}
+.activity-card .crit{font-size:.82rem;margin:0 0 1.25rem 1.1rem;color:var(--soft-black);} .activity-card .crit li{margin:.25rem 0;}
+.launch-btn{background-color:var(--primary-green);color:#fff;text-decoration:none;padding:.6rem 1rem;border-radius:6px;text-align:center;font-weight:600;font-size:.9rem;min-height:44px;display:flex;align-items:center;justify-content:center;}
+.launch-btn:hover{opacity:.9;}
+.callout{background:var(--accent-green);border:1px solid var(--light-green);border-radius:8px;padding:1.25rem 1.5rem;margin-top:1.5rem;color:var(--dark-black);}
+[data-theme="dark"] .callout{color:var(--bg-gray);}
+.callout strong{color:var(--primary-green);} [data-theme="dark"] .callout strong{color:var(--light-green);}
+.callout .label{display:block;font-weight:700;color:var(--primary-green);margin-bottom:.35rem;} [data-theme="dark"] .callout .label{color:var(--light-green);}
+.panel{background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:1.5rem;margin-top:1rem;}
+.fill-card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:1.5rem;display:grid;gap:1.25rem;margin-top:1rem;}
+.fill-row{display:grid;gap:.3rem;}
+.fill-row .role{font-weight:700;color:var(--dark-black);}
+.fill-row .where{font-size:.85rem;color:var(--soft-black);}
+.fill-row label{display:flex;gap:.5rem;align-items:center;font-size:.9rem;color:var(--soft-black);flex-wrap:wrap;}
+.fill-row input{flex:1;min-width:180px;padding:.5rem;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-gray);color:var(--dark-black);font:inherit;font-size:.9rem;min-height:40px;}
+.prose-list{margin:1rem 0 1rem 1.25rem;} .prose-list li{margin:.4rem 0;color:var(--soft-black);}
+.sources{margin:1rem 0 1rem 1.25rem;font-size:.9rem;} .sources li{margin:.5rem 0;color:var(--soft-black);}
+.tag{font-size:.7rem;font-weight:700;padding:1px 6px;border-radius:4px;color:#fff;margin-right:4px;}
+.tag.primary{background:var(--primary-green);} .tag.secondary{background:#8a7a3a;}
+.verify-note{font-size:.78rem;color:var(--soft-black);margin-top:1rem;}
+footer.site{text-align:center;margin-top:5rem;color:var(--soft-black);font-size:.85rem;padding:0 1.5rem;}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;}.flip-card-inner{transition:none !important;}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<header class="site"><div class="header-container"><a href="index.html" class="nav-back">&larr; Back to Course Dashboard</a><button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button></div></header>
+<main class="container" id="main">
+<div class="lesson-header"><span class="eyebrow">Day 2 · Capstone · Lesson 12</span><h1>Deploying Your Agentic Workflow</h1>
+<div class="description-box"><p><strong>Course Target:</strong> Bring the whole course together — design, draft, and present one end-to-end AI automation pipeline that takes a real academic-administration bottleneck from raw input to a finished, accessible, governed output you could actually deploy.</p><p>This is the capstone. You won’t learn a new tool today; you’ll <strong>integrate</strong> what you already have — scoped research (L8), structured extraction (L9), tool connection and sandboxed analysis (L10), and the governance guardrails (L11) — into one pipeline, then strengthen it through <strong>peer optimization</strong>. Deliverable: a pipeline plan, a working draft, and a 5-minute walkthrough.</p></div></div><section aria-labelledby="hook-h"><h2 id="hook-h">Start from your bottleneck</h2><div class="callout"><span class="label">A concrete goal for today</span>Pick the recurring administrative task that eats your week — the report you re-build, the data you re-type, the packet you re-assemble. By the end you’ll have a designed, partly-built, and peer-reviewed pipeline to take it off your plate — safely.</div></section><section aria-labelledby="obj-h"><h2 id="obj-h">Learning Objectives</h2><ul class="objectives-list"><li><strong>Design</strong> an end-to-end pipeline for a real academic-administration bottleneck, integrating skills from across the course (research, extraction, tool connection, analysis).</li><li><strong>Build a working draft and add the governance guardrails</strong> (de-identification, verification, human sign-off, accessibility) so it’s safe to deploy.</li><li><strong>Present</strong> your pipeline and <strong>give and use structured peer optimization</strong> to strengthen it before deployment.</li></ul><div class="callout"><span class="label">A note on what "done" means today</span>You’ll leave with a deployable <em>draft and plan</em> plus peer feedback — a strong first version, not a finished, fully-deployed system.</div></section><section aria-labelledby="terms-h"><h2 id="terms-h">Key Terms</h2><p style="font-size:.9rem;color:var(--soft-black);margin-bottom:1rem;">Select any card to flip it. Cards are keyboard-operable — press Enter or Space.</p><div class="terms-grid"><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>End-to-End Pipeline</strong><span class="level">Start here</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>A chain of small steps that takes a task from raw input to a finished, delivered output — with a checkpoint between the steps that matter.</p></div></div></button><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>Bottleneck</strong><span class="level">Build on it</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>The recurring, time-eating admin task worth automating — repetitive, rule-based, and high-volume. The best capstone targets are boring and frequent.</p></div></div></button><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>Guardrail</strong><span class="level">Make it safe</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>A control that keeps an automation safe: de-identification, verification, human sign-off, an accessibility check, and an audit trail.</p></div></div></button><button class="flip-card" type="button" aria-pressed="false"><div class="flip-card-inner"><div class="flip-card-front"><strong>Peer Optimization</strong><span class="level">Make it better</span><span class="hint">Tap to flip</span></div><div class="flip-card-back"><p>Structured peer review — colleagues stress-test your pipeline for gaps and suggest improvements before you deploy. A risk you miss, a peer catches.</p></div></div></button></div></section><section aria-labelledby="outline-h"><h2 id="outline-h">Course Outline &amp; Lesson Modules</h2><div class="content-window"><div class="content-tabs" role="tablist" aria-label="Lesson 12 reading sections"><button class="tab-btn" id="tab-0" type="button" role="tab" aria-selected="true" aria-controls="pane-0" tabindex="0">Page 1: The Capstone Brief</button><button class="tab-btn" id="tab-1" type="button" role="tab" aria-selected="false" aria-controls="pane-1" tabindex="-1">Page 2: A Worked Pipeline</button><button class="tab-btn" id="tab-2" type="button" role="tab" aria-selected="false" aria-controls="pane-2" tabindex="-1">Page 3: Integration Checklist</button></div><div class="content-pane" id="pane-0" role="tabpanel" aria-labelledby="tab-0" tabindex="0"><div class="analogy-box"><strong>If you remember one thing:</strong> A deployable pipeline isn’t one clever prompt — it’s small checkable steps, a guardrail at every risky one, and a human at the irreversible step.</div><h3>What you’ll deliver</h3><ul><li><strong>A pipeline plan</strong> — the bottleneck, the outcome, and the mapped stages.</li><li><strong>A working draft</strong> — at least the riskiest steps drafted/prompted, with guardrails attached.</li><li><strong>A 5-minute walkthrough</strong> — what it does, how it’s guarded, and where you’re unsure — plus peer review.</li></ul><h3>What makes a pipeline deployable</h3><ul><li><strong>Small, checkable steps</strong> — so you can verify each, not one opaque mega-step.</li><li><strong>Guardrails</strong> — de-identification, verification, human sign-off, accessibility.</li><li><strong>An audit trail</strong> — inputs, prompts, outputs, dates — so it’s defensible.</li><li><strong>A clear stop/failure behavior</strong> — it asks for help or halts rather than guessing.</li></ul><p>You’ll be assessed on the <a href="#rubric-h">capstone rubric</a> below — design it against those criteria from the start.</p><details class="reveal"><summary>Quick check: your pipeline auto-emails a report the moment the AI finishes. What’s missing?</summary><p>The human sign-off — and probably verification and an audit trail. Insert your approval before anything is sent; never let the last step be irreversible and unattended.</p></details></div><div class="content-pane" id="pane-1" role="tabpanel" aria-labelledby="tab-1" tabindex="0" hidden><div class="analogy-box"><strong>If you remember one thing:</strong> Every stage of a good pipeline maps to something you already learned — and to a guardrail. The capstone is assembly, not invention.</div><h3>Exemplar — an accessible weekly program digest</h3><p>The bottleneck: every week you hand-compile program updates and student-success numbers into a post. Here’s the same job as a guarded pipeline:</p><pre style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.5;background:var(--bg-gray);border:1px solid var(--border-color);border-radius:6px;padding:1rem;overflow:auto;color:var(--dark-black);margin-top:1rem;" aria-label="End-to-end pipeline: pick a bottleneck and define the outcome, then Gather/Research, Extract, Connect/Analyze, Assemble, Verify, Sign off, and Deliver — each stage drawing on a course lesson, with an audit trail.">Pick a bottleneck → define the outcome
+   |
+   ▼  Gather / Research   (L8: a scoped loop — sources + stop condition)
+   ▼  Extract             (L9: structured output, the "not found" rule)
+   ▼  Connect / Analyze   (L10: approved tool, sandbox, de-identified data)
+   ▼  Assemble            (data + template → draft)
+   ▼  Verify              (recompute a figure / check against the source)
+   ▼  Sign off            (YOU approve — human in the loop, L11)
+   ▼  Deliver             (accessible output — WCAG check, L11)  + audit trail</pre><p>Notice how each stage draws on a lesson and carries a guardrail: the research loop is scoped (L8); extraction asks for structured output (L9); the metrics are de-identified and analyzed in a sandbox (L10); a human signs off and the post is WCAG-checked before publishing (L11) — with an audit trail throughout.</p><div class="callout"><span class="label">Your turn</span>Your pipeline won’t have all eight stages — keep only the ones your bottleneck needs. The non-negotiables are <strong>verification</strong> and <strong>human sign-off</strong> wherever the output is consequential.</div><details class="reveal"><summary>Quick check: which two stages should almost never be dropped?</summary><p>Verify and Sign off. Speed is the point of the others; trust and safety come from those two.</p></details></div><div class="content-pane" id="pane-2" role="tabpanel" aria-labelledby="tab-2" tabindex="0" hidden><div class="analogy-box"><strong>If you remember one thing:</strong> You already built the parts in Lessons 8–11. This checklist is how you make sure none of them is missing from your pipeline.</div><p>Run every item against your design — copy and keep it:</p><pre style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.5;background:var(--bg-gray);border:1px solid var(--border-color);border-radius:6px;padding:1rem;overflow:auto;color:var(--dark-black);margin-top:1rem;" aria-label="Capstone integration checklist covering bottleneck, scope, extraction, tools and data, verification, human sign-off, accessibility, and audit trail.">Capstone integration checklist — apply each to your pipeline:
+[ ] Bottleneck & outcome — a real recurring task, with a clear definition of "done."
+[ ] Scope (L8) — bounded steps and a stop condition; no endless crawl.
+[ ] Extraction (L9) — ask for structured output; mark missing fields "not found."
+[ ] Tools & data (L10) — only approved connections; sandbox for code; de-identify student data.
+[ ] Verification — recompute a figure / check output against the source.
+[ ] Human sign-off (L11) — a person approves before any irreversible action.
+[ ] Accessibility (L11) — run the four-principle WCAG check on the output.
+[ ] Audit trail — keep inputs, prompts, outputs, and dates.</pre><p>Each item links back to a lesson’s reusable artifact: the discovery-loop instruction (L8), the extraction template (L9), the "Should I connect this tool?" decision aid and sandbox settings (L10), and the FERPA decision aid, injection defense, and WCAG pre-publish checklist (L11).</p><details class="reveal"><summary>Quick check: your pipeline never touches student data. Which items still apply?</summary><p>Most of them — scope, extraction quality, verification, human sign-off, accessibility of the output, and an audit trail all still matter. De-identification is the one you can relax (because there’s no PII to protect).</p></details></div></div></section><section aria-labelledby="rubric-h"><h2 id="rubric-h">Capstone Rubric</h2><p>Your pipeline and walkthrough are assessed on these five criteria. Design to meet them.</p><table class="data-table"><caption>What "meets" looks like</caption><thead><tr><th scope="col">Criterion</th><th scope="col">Meets when…</th></tr></thead><tbody><tr><td>Integration</td><td>Uses at least three course skills in one connected flow (e.g., scoped research + extraction + analysis/connection).</td></tr><tr><td>Guardrails</td><td>De-identifies sensitive data, includes a verification step, and requires human sign-off before any irreversible action; output is accessible.</td></tr><tr><td>Reliability</td><td>Small, checkable steps; a clear stop/failure behavior; an audit trail.</td></tr><tr><td>Fit</td><td>Targets a real, recurring bottleneck with a clearly defined outcome.</td></tr><tr><td>Presentation &amp; peer response</td><td>Clear 5-minute walkthrough that names its own risks and folds in at least one peer optimization.</td></tr></tbody></table></section><section aria-labelledby="ready-h"><h2 id="ready-h">Before You Present</h2><div class="panel"><p style="color:var(--soft-black);margin:0;">A quick self-check: can you say, in one sentence each, (1) the bottleneck and outcome, (2) the stages, (3) where verification and sign-off sit, and (4) the one risk you most want a peer to pressure-test? If yes, you’re ready.</p></div></section><section aria-labelledby="act-h"><h2 id="act-h">Hands-on Workspace Modules</h2><div class="activities-grid"><div class="activity-card"><div><div class="activity-num">Activity 01</div><h3>Scope &amp; Map</h3><p>Choose your bottleneck, define the outcome, and map the pipeline stages — keeping only what you need.</p><ul class="crit"><li>real bottleneck + clear outcome;</li><li>stages mapped;</li><li>data touched / de-identification noted.</li></ul></div><a href="lesson12-act01.html" class="launch-btn">Open Activity 1</a></div><div class="activity-card"><div><div class="activity-num">Activity 02</div><h3>Build a Draft &amp; Guardrail It</h3><p>For each stage, note the tool/prompt you’d use and attach the guardrail from the integration checklist.</p><ul class="crit"><li>tool/prompt per stage;</li><li>a guardrail on every risky step;</li><li>verification + sign-off present.</li></ul></div><a href="lesson12-act02.html" class="launch-btn">Open Activity 2</a></div><div class="activity-card"><div><div class="activity-num">Activity 03</div><h3>Present &amp; Peer-Optimize</h3><p>Prepare your 5-minute walkthrough, then give a structured peer review against the rubric — and fold in what you receive.</p><ul class="crit"><li>walkthrough names its own risks;</li><li>peer review: strength + risk + optimization;</li><li>one peer idea adopted.</li></ul></div><a href="lesson12-act03.html" class="launch-btn">Open Activity 3</a></div></div></section><section aria-labelledby="wrap-h"><h2 id="wrap-h">Wrap-up</h2><div class="callout"><span class="label">Reflect (2 minutes)</span>What is the single guardrail you’ll never skip when you deploy this for real — and who at your institution do you need on board first?</div><div class="callout"><span class="label">Model what you teach: disclose your AI use</span>When your pipeline produces something students or colleagues see, say AI helped make it — briefly and plainly.</div><div class="callout"><span class="label">From draft to deployed</span>Next steps: confirm your tools are institution-approved, pilot on de-identified or low-stakes data, keep the audit trail, and review with the right office (privacy / IT / accessibility) before it goes live.</div></section><section aria-labelledby="src-h"><h2 id="src-h">Sources &amp; Further Reading</h2><ol class="sources"><li><span class="tag primary">Primary</span> FERPA, 20 U.S.C. § 1232g; U.S. Dept. of Education, Student Privacy Policy Office (studentprivacy.ed.gov) — for any pipeline that touches student data.</li><li><span class="tag primary">Primary</span> Section 508 of the Rehabilitation Act &amp; WCAG 2.2 / ISO/IEC 40500:2025 (section508.gov) — for the accessibility of anything you deliver.</li><li><span class="tag primary">Primary</span> Your institution’s AI / acceptable-use and data-governance policy — the authority on what you may deploy and on which tools.</li></ol><p class="verify-note">A capstone pipeline is only deployable once its tools are approved and its data handling is cleared — verify both with your institution before going live.</p></section></main>
+<footer class="site"><p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p></footer>
+<script>
+(function(){
+  var root=document.documentElement, toggle=document.getElementById('themeToggle');
+  function currentTheme(){var a=root.getAttribute('data-theme');if(a)return a;return (window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}
+  function syncToggle(){var t=currentTheme();toggle.textContent=(t==='dark')?'☀️ Toggle Light Mode':'🌓 Toggle Dark Mode';toggle.setAttribute('aria-pressed',String(t==='dark'));}
+  try{var s=localStorage.getItem('aiac-theme');if(s==='dark'||s==='light')root.setAttribute('data-theme',s);}catch(e){}
+  syncToggle();
+  toggle.addEventListener('click',function(){var n=(currentTheme()==='dark')?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('aiac-theme',n);}catch(e){}syncToggle();});
+  // flip cards
+  document.querySelectorAll('.flip-card').forEach(function(card){card.addEventListener('click',function(){var f=card.classList.toggle('flipped');card.setAttribute('aria-pressed',String(f));});});
+  // tabs
+  var tabs=Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function selectTab(tab){tabs.forEach(function(t){var sel=(t===tab);t.setAttribute('aria-selected',String(sel));t.setAttribute('tabindex',sel?'0':'-1');var p=document.getElementById(t.getAttribute('aria-controls'));if(p)p.hidden=!sel;});}
+  tabs.forEach(function(tab,i){tab.addEventListener('click',function(){selectTab(tab);});
+    tab.addEventListener('keydown',function(e){var idx=i;
+      if(e.key==='ArrowRight'||e.key==='ArrowDown'){idx=(i+1)%tabs.length;}
+      else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){idx=(i-1+tabs.length)%tabs.length;}
+      else if(e.key==='Home'){idx=0;} else if(e.key==='End'){idx=tabs.length-1;} else {return;}
+      e.preventDefault();tabs[idx].focus();selectTab(tabs[idx]);});});
+  // autosave help-card fields
+  document.querySelectorAll('[data-save]').forEach(function(el){var key='aiac-l11-'+el.id;
+    try{var v=localStorage.getItem(key);if(v!==null)el.value=v;}catch(e){}
+    el.addEventListener('input',function(){try{localStorage.setItem(key,el.value);}catch(e){}});});
+})();
+</script>
+</body>
+</html>
