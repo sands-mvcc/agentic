@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Activity 2 of Lesson 10: scope a least-privilege sandbox for an AI-generated analysis script and catch the risky line.">
+<title>Activity 2 — Scope a Sandbox | Lesson 10</title>
+<style>
+:root{--primary-green:#15803d;--light-green:#bbf7d0;--accent-green:#f0fdf4;--dark-black:#111827;
+--soft-black:#374151;--pure-white:#ffffff;--bg-gray:#f9fafb;--border-color:#e5e7eb;
+--font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--card-bg:#ffffff;--code-bg:#f3f4f6;--focus-ring:#166534;--warn:#b45309;--good:#15803d;--bad:#b91c1c;}
+[data-theme="dark"]{--bg-gray:#111827;--dark-black:#f9fafb;--soft-black:#d1d5db;--pure-white:#1f2937;--card-bg:#1f2937;
+--border-color:#374151;--accent-green:#14532d;--light-green:#4ade80;--code-bg:#0f172a;--focus-ring:#4ade80;--warn:#fbbf24;--good:#4ade80;--bad:#f87171;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg-gray:#111827;--dark-black:#f9fafb;--soft-black:#d1d5db;
+--pure-white:#1f2937;--card-bg:#1f2937;--border-color:#374151;--accent-green:#14532d;--light-green:#4ade80;--code-bg:#0f172a;--focus-ring:#4ade80;--warn:#fbbf24;--good:#4ade80;--bad:#f87171;}}
+*{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s ease,color .2s ease,border-color .2s ease;}
+body{font-family:var(--font-family);background:var(--bg-gray);color:var(--dark-black);line-height:1.6;padding-bottom:5rem;}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px;border-radius:4px;}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--primary-green);color:#fff;padding:.75rem 1rem;z-index:100;border-radius:0 0 6px 0;font-weight:600;text-decoration:none;}
+.skip-link:focus{left:0;}
+header.site{background:#111827;color:#fff;padding:2rem;border-bottom:5px solid var(--primary-green);}
+.header-container{max-width:980px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+.nav-back{color:#86efac;text-decoration:none;font-weight:600;font-size:.95rem;min-height:44px;display:inline-flex;align-items:center;}
+.nav-back:hover{text-decoration:underline;}
+.theme-toggle-btn{background:var(--primary-green);color:#fff;border:none;padding:.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;font-size:.85rem;min-height:44px;}
+.theme-toggle-btn:hover{opacity:.9;}
+.container{max-width:980px;margin:2rem auto;padding:0 1.5rem;}
+.activity-tag{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--primary-green);margin-bottom:.75rem;}
+h1{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:800;margin-bottom:1rem;border-left:6px solid var(--primary-green);padding-left:1rem;line-height:1.15;}
+.lede{background:var(--card-bg);border:1px solid var(--border-color);padding:1.5rem;border-radius:8px;color:var(--soft-black);margin-bottom:2rem;}
+h2{font-size:1.4rem;margin:2.5rem 0 1.25rem;padding-bottom:.5rem;border-bottom:2px solid var(--primary-green);color:var(--dark-black);}
+h3{color:var(--dark-black);font-size:1.1rem;margin:1.5rem 0 .5rem;}
+p{color:var(--soft-black);}
+.panel{background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:1.5rem;margin-top:1.25rem;}
+.panel ul,.panel ol{margin:.5rem 0 .5rem 1.25rem;} .panel li{margin:.35rem 0;color:var(--soft-black);}
+.progress-wrap{display:flex;align-items:center;gap:.75rem;margin:.5rem 0 1rem;}
+progress{width:100%;height:14px;} .progress-label{font-size:.85rem;font-weight:600;color:var(--primary-green);white-space:nowrap;}
+.check-list{list-style:none;}
+.check-list li{border:1px solid var(--border-color);border-radius:6px;margin-bottom:.5rem;background:var(--bg-gray);}
+.check-list label{display:flex;gap:.75rem;align-items:flex-start;padding:.9rem 1rem;cursor:pointer;min-height:44px;}
+.check-list input{margin-top:.2rem;width:1.1rem;height:1.1rem;accent-color:var(--primary-green);flex-shrink:0;}
+.check-list .done{text-decoration:line-through;color:var(--soft-black);opacity:.7;}
+.prompt-block{position:relative;background:var(--code-bg);border:1px solid var(--border-color);border-radius:6px;padding:1rem;margin-top:.75rem;}
+.prompt-block pre{white-space:pre-wrap;word-break:break-word;font-size:.9rem;color:var(--dark-black);font-family:"SFMono-Regular",Menlo,Consolas,monospace;}
+.copy-btn{margin-top:.75rem;background:var(--primary-green);color:#fff;border:none;border-radius:6px;padding:.45rem .9rem;font-weight:600;font-size:.82rem;cursor:pointer;min-height:36px;}
+.copy-btn:hover{opacity:.9;}
+.field{display:flex;flex-direction:column;gap:.35rem;margin-top:1rem;}
+.field label{font-weight:600;font-size:.9rem;color:var(--dark-black);}
+.field input[type="text"]{padding:.6rem;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-gray);color:var(--dark-black);font-size:.95rem;font-family:inherit;min-height:44px;}
+textarea{width:100%;min-height:120px;padding:.8rem;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-gray);color:var(--dark-black);font-family:inherit;font-size:.95rem;resize:vertical;margin-top:.5rem;}
+.ws-table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:.5rem;}
+.ws-table th,.ws-table td{border:1px solid var(--border-color);padding:.4rem;text-align:left;vertical-align:top;}
+.ws-table thead th{background:var(--accent-green);color:var(--dark-black);} [data-theme="dark"] .ws-table thead th{color:var(--bg-gray);}
+.ws-table .node{background:var(--bg-gray);font-weight:600;color:var(--dark-black);padding:.6rem;}
+.ws-table input,.ws-table textarea{width:100%;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-gray);color:var(--dark-black);font:inherit;font-size:.85rem;padding:.4rem;margin:0;min-height:38px;}
+.btn-ghost{background:transparent;color:var(--primary-green);border:1px solid var(--primary-green);border-radius:6px;padding:.6rem 1rem;font-weight:600;font-size:.85rem;cursor:pointer;min-height:44px;margin-top:1rem;}
+.save-note{font-size:.8rem;color:var(--soft-black);margin-top:.5rem;}
+details.reveal{border:1px solid var(--border-color);border-left:5px solid var(--primary-green);border-radius:6px;background:var(--card-bg);padding:1rem 1.25rem;margin-top:1.5rem;}
+details.reveal>summary{cursor:pointer;font-weight:700;color:var(--primary-green);list-style:none;}
+details.reveal>summary::-webkit-details-marker{display:none;}
+details.reveal>summary::before{content:"\25B8  ";} details.reveal[open]>summary::before{content:"\25BE  ";}
+details.reveal[open]>summary{margin-bottom:.75rem;} details.reveal p{margin-top:.5rem;}
+.model-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:.5rem;}
+.model-table th,.model-table td{border:1px solid var(--border-color);padding:.5rem;text-align:left;vertical-align:top;color:var(--soft-black);}
+.model-table thead th{background:var(--accent-green);color:var(--dark-black);} [data-theme="dark"] .model-table thead th{color:var(--bg-gray);}
+.callout{background:var(--accent-green);border:1px solid var(--light-green);border-radius:8px;padding:1.1rem 1.4rem;margin-top:1.5rem;color:var(--dark-black);}
+[data-theme="dark"] .callout{color:var(--bg-gray);} .callout strong{color:var(--primary-green);} [data-theme="dark"] .callout strong{color:var(--light-green);}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+footer.site{text-align:center;margin-top:5rem;color:var(--soft-black);font-size:.85rem;padding:0 1.5rem;}
+.nav-foot{display:flex;justify-content:space-between;gap:1rem;margin-top:2.5rem;flex-wrap:wrap;}
+.nav-foot a{color:var(--primary-green);font-weight:600;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;}
+.nav-foot a:hover{text-decoration:underline;}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<header class="site"><div class="header-container"><a href="lesson10.html" class="nav-back">&larr; Back to Lesson 10</a><button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button></div></header>
+<main class="container" id="main">
+<span class="activity-tag">Lesson 10 · Activity 02</span>
+<h1>Scope a Sandbox</h1>
+<p class="lede">AI writes the analysis; you decide how it runs. Here you'll scope a sandbox for an AI-generated script, set least-privilege, and catch the line that shouldn't be there.</p><h2>Work through it</h2><div class="progress-wrap"><progress id="prog" max="4" value="0"></progress><span class="progress-label" id="progLabel" aria-live="polite">0 of 4 done</span></div><ul class="check-list" id="checklist"><li><label><input type="checkbox" data-step><span>Read the script and spot anything that reaches outside the data.</span></label></li><li><label><input type="checkbox" data-step><span>Decide: sandbox or not?</span></label></li><li><label><input type="checkbox" data-step><span>Set the least-privilege settings below.</span></label></li><li><label><input type="checkbox" data-step><span>Compare to the model answer.</span></label></li></ul><h2>The AI-generated script</h2><div class="prompt-block"><pre id="scriptBlock">import pandas as pd
+df = pd.read_csv("scores.csv")          # local file
+import urllib.request                    # <-- network
+urllib.request.urlretrieve(             # <-- downloads from the internet
+    "http://example.com/extra.csv", "extra.csv")
+print(df["score"].mean())</pre><button class="copy-btn" type="button" data-copy="#scriptBlock">Copy script</button></div><h2>Scope the sandbox</h2><p>Check the settings you’d apply, then explain your reasoning. Saved on this device.</p><ul class="check-list"><li><label><input type="checkbox" data-save id="a2s1"><span>Network <strong>off</strong> (no internet egress)</span></label></li><li><label><input type="checkbox" data-save id="a2s2"><span>Data mounted <strong>read-only</strong></span></label></li><li><label><input type="checkbox" data-save id="a2s3"><span>Data <strong>de-identified</strong> (no names/IDs)</span></label></li><li><label><input type="checkbox" data-save id="a2s4"><span>Resource limits + no stored credentials</span></label></li></ul><div class="field"><label for="a2why">What in the script forced your decision, and what did you change?</label><textarea id="a2why" data-save placeholder="The line that reaches outside the data is... so I..."></textarea></div><button class="btn-ghost" id="resetWork" type="button">Reset my work</button><p class="save-note">Saved automatically on this device.</p><details class="reveal"><summary>Reveal model answer</summary><p><strong>Decision:</strong> sandbox — the script touches data <em>and</em> the network. <strong>Settings:</strong> all four (network off, read-only, de-identified, limits/no creds). <strong>The red flag:</strong> the <code>urllib.request.urlretrieve(...)</code> call downloads a file from the internet — remove it (or it fails safely with network off). A hidden instruction could have planted that line; the sandbox is what makes it harmless.</p><div class="callout"><strong>Takeaway:</strong> turning the network off doesn’t just save you here — it neutralizes a whole class of "phone home" and data-exfiltration mistakes automatically.</div></details>
+<nav class="nav-foot" aria-label="Activity navigation"><a href="lesson10-act01.html">&larr; Activity 1</a><a href="lesson10-act03.html">Activity 3: Verified Data Analysis &rarr;</a></nav>
+<div class="sr-only" id="live" aria-live="polite"></div>
+</main>
+<footer class="site"><p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p></footer>
+<script>
+(function(){
+  var STORE='aiac-l10-act02-v1';
+  var root=document.documentElement, toggle=document.getElementById('themeToggle');
+  function currentTheme(){var a=root.getAttribute('data-theme');if(a)return a;return (window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}
+  function syncToggle(){var t=currentTheme();toggle.textContent=(t==='dark')?'☀️ Toggle Light Mode':'🌓 Toggle Dark Mode';toggle.setAttribute('aria-pressed',String(t==='dark'));}
+  try{var s=localStorage.getItem('aiac-theme');if(s==='dark'||s==='light')root.setAttribute('data-theme',s);}catch(e){}
+  syncToggle();
+  toggle.addEventListener('click',function(){var n=(currentTheme()==='dark')?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('aiac-theme',n);}catch(e){}syncToggle();});
+
+  function load(){try{return JSON.parse(localStorage.getItem(STORE))||{};}catch(e){return {};}}
+  function save(st){try{localStorage.setItem(STORE,JSON.stringify(st));}catch(e){}}
+  var state=load(); state.fields=state.fields||{}; state.steps=state.steps||{};
+
+  document.querySelectorAll('[data-save]').forEach(function(el){var id=el.id;if(!id)return;
+    if(el.type==='checkbox'){if(state.fields[id]!=null)el.checked=state.fields[id];el.addEventListener('change',function(){state.fields[id]=el.checked;save(state);});}
+    else{if(state.fields[id]!=null)el.value=state.fields[id];el.addEventListener('input',function(){state.fields[id]=el.value;save(state);});}});
+
+  var boxes=Array.prototype.slice.call(document.querySelectorAll('[data-step]'));
+  var prog=document.getElementById('prog'), label=document.getElementById('progLabel');
+  function render(){if(!prog)return;var done=boxes.filter(function(b){return b.checked;}).length;prog.value=done;label.textContent=done+' of '+boxes.length+' done';}
+  boxes.forEach(function(b,i){var key='s'+i;if(state.steps[key]!=null)b.checked=state.steps[key];
+    if(b.checked)b.closest('label').querySelector('span').classList.add('done');
+    b.addEventListener('change',function(){state.steps[key]=b.checked;b.closest('label').querySelector('span').classList.toggle('done',b.checked);save(state);render();});});
+  render();
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn){btn.addEventListener('click',function(){
+    var el=document.querySelector(btn.getAttribute('data-copy'));var text=el?el.textContent:'';
+    function ok(){var o=btn.textContent;btn.textContent='Copied ✓';setTimeout(function(){btn.textContent=o;},1500);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok).catch(function(){lc(text,ok);});}else{lc(text,ok);}});});
+  function lc(text,cb){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');cb();}catch(e){}document.body.removeChild(ta);}
+
+  var rb=document.getElementById('resetWork');
+  if(rb){rb.addEventListener('click',function(){try{localStorage.removeItem(STORE);}catch(e){}location.reload();});}
+})();
+</script>
+</body>
+</html>
