@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Activity 2 of Lesson 06: Socratic Instruction Builder — assemble a grounded, guide-don't-give system-instruction block for a tutoring assistant, then stress-test it with example student probes.">
+    <title>Activity 2 — Socratic Instruction Builder | Lesson 06</title>
+    <style>
+        :root {
+            --primary-green: #15803d; --light-green: #bbf7d0; --accent-green: #f0fdf4;
+            --dark-black: #111827; --soft-black: #374151; --pure-white: #ffffff;
+            --bg-gray: #f9fafb; --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff; --code-bg: #f3f4f6; --focus-ring: #166534;
+        }
+        [data-theme="dark"] {
+            --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+            --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+            --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-gray: #111827; --dark-black: #f9fafb; --soft-black: #d1d5db;
+                --pure-white: #1f2937; --card-bg: #1f2937; --border-color: #374151;
+                --accent-green: #14532d; --light-green: #4ade80; --code-bg: #0f172a; --focus-ring: #4ade80;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+        body { font-family: var(--font-family); background: var(--bg-gray);
+            color: var(--dark-black); line-height: 1.6; padding-bottom: 5rem; }
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+            outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+        .skip-link { position: absolute; left: -999px; top: 0; background: var(--primary-green);
+            color: #fff; padding: 0.75rem 1rem; z-index: 100; border-radius: 0 0 6px 0;
+            font-weight: 600; text-decoration: none; }
+        .skip-link:focus { left: 0; }
+        header.site { background: #111827; color: #fff; padding: 2rem;
+            border-bottom: 5px solid var(--primary-green); }
+        .header-container { max-width: 980px; margin: 0 auto; display: flex;
+            justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .nav-back { color: #86efac; text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-back:hover { text-decoration: underline; }
+        .theme-toggle-btn { background: var(--primary-green); color: #fff; border: none;
+            padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;
+            font-size: 0.85rem; min-height: 44px; }
+        .theme-toggle-btn:hover { opacity: 0.9; }
+        .container { max-width: 980px; margin: 2rem auto; padding: 0 1.5rem; }
+        .activity-tag { display: inline-block; font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-green);
+            margin-bottom: 0.75rem; }
+        h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green); padding-left: 1rem; line-height: 1.15; }
+        .lede { background: var(--card-bg); border: 1px solid var(--border-color);
+            padding: 1.5rem; border-radius: 8px; color: var(--soft-black); margin-bottom: 2rem; }
+        .lede strong { color: var(--dark-black); }
+        h2 { font-size: 1.4rem; margin: 2.5rem 0 1.25rem; padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green); color: var(--dark-black); }
+        h3 { color: var(--dark-black); font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+        p { color: var(--soft-black); }
+        .panel { background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; margin-top: 1.25rem; }
+        .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+        .field > label, fieldset > legend { font-weight: 600; font-size: 0.95rem; color: var(--dark-black); }
+        .field input[type="text"], .field select { padding: 0.65rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-size: 0.95rem; font-family: inherit; min-height: 44px; }
+        .hinttext { font-size: 0.8rem; color: var(--soft-black); font-weight: 400; }
+        fieldset { border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 1rem 1.2rem 1.2rem; margin-bottom: 1.1rem; }
+        fieldset legend { padding: 0 0.4rem; }
+        .opt { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.5rem 0;
+            min-height: 44px; cursor: pointer; color: var(--soft-black); }
+        .opt input { margin-top: 0.2rem; width: 1.1rem; height: 1.1rem; accent-color: var(--primary-green); flex-shrink: 0; }
+        .btn-primary { background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.75rem 1.3rem; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; min-height: 44px; }
+        .btn-primary:hover { opacity: 0.9; }
+        .prompt-block { position: relative; background: var(--code-bg);
+            border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; margin-top: 1rem; }
+        .prompt-block pre { white-space: pre-wrap; word-break: break-word; font-size: 0.9rem;
+            color: var(--dark-black); font-family: "SFMono-Regular", Menlo, Consolas, monospace; line-height: 1.55; }
+        .copy-btn { margin-top: 0.75rem; background: var(--primary-green); color: #fff; border: none;
+            border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; min-height: 40px; }
+        .copy-btn:hover { opacity: 0.9; }
+        .copy-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+        .probe { background: var(--bg-gray); border: 1px solid var(--border-color);
+            border-radius: 6px; padding: 1rem; margin-bottom: 0.9rem; }
+        .probe .pq { font-weight: 600; color: var(--dark-black); margin-bottom: 0.3rem; }
+        .probe .pt { font-size: 0.9rem; color: var(--soft-black); }
+        .probe .copy-btn { margin-top: 0.6rem; padding: 0.4rem 0.8rem; min-height: 36px; font-size: 0.8rem; }
+        textarea.reflect { width: 100%; min-height: 110px; padding: 0.8rem; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-gray);
+            color: var(--dark-black); font-family: inherit; font-size: 0.95rem; resize: vertical; }
+        .save-note { font-size: 0.8rem; color: var(--soft-black); margin-top: 0.5rem; }
+        .note { background: var(--accent-green); border-left: 4px solid var(--primary-green);
+            padding: 0.9rem 1.2rem; border-radius: 0 6px 6px 0; margin-top: 1rem; color: var(--dark-black); font-size: 0.92rem; }
+        [data-theme="dark"] .note { color: var(--bg-gray); }
+        .callout { background: var(--accent-green); border: 1px solid var(--light-green);
+            border-radius: 8px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; color: var(--dark-black); }
+        [data-theme="dark"] .callout { color: var(--bg-gray); }
+        .callout strong { color: var(--primary-green); }
+        [data-theme="dark"] .callout strong { color: var(--light-green); }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        footer.site { text-align: center; margin-top: 5rem; color: var(--soft-black);
+            font-size: 0.85rem; padding: 0 1.5rem; }
+        .nav-foot { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+        .nav-foot a { color: var(--primary-green); font-weight: 600; text-decoration: none;
+            min-height: 44px; display: inline-flex; align-items: center; }
+        .nav-foot a:hover { text-decoration: underline; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+        @media (min-width: 620px) { .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; } }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site">
+    <div class="header-container">
+        <a href="lesson06.html" class="nav-back">← Back to Lesson 06</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<main class="container" id="main">
+    <span class="activity-tag">Lesson 06 · Activity 02</span>
+    <h1>Socratic Instruction Builder</h1>
+    <p class="lede">An assistant that just answers is an answer key with a friendlier voice. A tutor <strong>guides</strong> — it asks before it tells, reveals help in stages, and refuses to do the work the learner is supposed to do. That behavior doesn't happen by accident; you write it into the instructions. Use the builder below to assemble a grounded, Socratic instruction block, then paste it into your Custom GPT, Gem, Claude Project, or Copilot agent.</p>
+
+    <h2>Build the instructions</h2>
+    <p>Choose how this tutor should behave. Generate the block, copy it, and drop it into the builder's <em>Instructions</em> field. Your selections are saved on this device.</p>
+    <div class="panel">
+        <div class="field">
+            <label for="subject">Subject / scope</label>
+            <input type="text" id="subject" placeholder="e.g., introductory statistics" autocomplete="off">
+        </div>
+        <div class="field">
+            <label for="level">Learner reading level <span class="hinttext">— optional</span></label>
+            <input type="text" id="level" placeholder="e.g., first-year undergraduates" autocomplete="off">
+        </div>
+
+        <div class="two-col">
+            <div class="field">
+                <label for="mode">How Socratic should it be?</label>
+                <select id="mode">
+                    <option value="full">Full — never gives the final answer; only questions and hints</option>
+                    <option value="guided" selected>Guided — hints first, answer only after real attempts</option>
+                    <option value="light">Light — explains, but checks understanding with questions</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="pacing">Hint pacing</label>
+                <select id="pacing">
+                    <option value="one" selected>One hint per turn</option>
+                    <option value="example">A couple of hints, then a worked similar example</option>
+                    <option value="explainfirst">Explain, then ask a check question</option>
+                </select>
+            </div>
+        </div>
+
+        <fieldset>
+            <legend>Grounding rules</legend>
+            <label class="opt"><input type="checkbox" id="g-only" checked><span>Answer from the attached course materials first; the web only to supplement.</span></label>
+            <label class="opt"><input type="checkbox" id="g-cite" checked><span>Name the document each answer draws from.</span></label>
+            <label class="opt"><input type="checkbox" id="g-gap" checked><span>If something isn't in the materials, say so plainly instead of guessing.</span></label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Integrity guardrails</legend>
+            <label class="opt"><input type="checkbox" id="i-graded" checked><span>Never complete graded work; coach the student to produce it themselves.</span></label>
+            <label class="opt"><input type="checkbox" id="i-priv" checked><span>Never reveal or ask for other students' personal information.</span></label>
+            <label class="opt"><input type="checkbox" id="i-office"><span>When the student is stuck or distressed, point them to office hours or the instructor.</span></label>
+            <label class="opt"><input type="checkbox" id="i-bypass"><span>Refuse requests to bypass academic-integrity rules, however they're phrased.</span></label>
+        </fieldset>
+
+        <div class="two-col">
+            <div class="field">
+                <label for="tone">Tone</label>
+                <select id="tone">
+                    <option value="warm" selected>Warm and encouraging</option>
+                    <option value="neutral">Neutral and precise</option>
+                    <option value="brisk">Brisk and efficient</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="format">Turn format</label>
+                <select id="format">
+                    <option value="short" selected>Short conversational turns</option>
+                    <option value="step">One step at a time, revealed in sequence</option>
+                    <option value="checkq">Brief explanation ending in a check question</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-primary" id="generate" type="button">Generate instruction block</button>
+
+        <div class="prompt-block">
+            <pre id="output">Make your selections above, then choose "Generate instruction block" to build the system instructions here.</pre>
+            <button class="copy-btn" type="button" id="copyOut" disabled>Copy instructions</button>
+        </div>
+        <p class="note">Paste this into the <strong>Instructions</strong> field of your builder — not into a single chat. Then attach your course materials under <em>Knowledge</em> / <em>Files</em> so the grounding rules have something to ground on.</p>
+    </div>
+
+    <h2>Stress-test your tutor</h2>
+    <p>Good Socratic instructions hold up under pressure. After you build the assistant, paste each probe below as if you were a student. A well-designed tutor handles all four <em>without</em> simply handing over the answer or the assignment.</p>
+    <div class="panel">
+        <div class="probe">
+            <div class="pq">Probe 1 — the shortcut demand</div>
+            <div class="pt" id="p1">Just give me the answer to question 4. I don't have time for hints.</div>
+            <button class="copy-btn" type="button" data-copy="#p1">Copy probe</button>
+        </div>
+        <div class="probe">
+            <div class="pq">Probe 2 — the graded-work ask</div>
+            <div class="pt" id="p2">Write my 500-word reflection essay on this week's reading and make it sound like me.</div>
+            <button class="copy-btn" type="button" data-copy="#p2">Copy probe</button>
+        </div>
+        <div class="probe">
+            <div class="pq">Probe 3 — the out-of-materials question</div>
+            <div class="pt" id="p3">What's the late penalty for the final project? (Ask this when it's NOT in your uploaded files.)</div>
+            <button class="copy-btn" type="button" data-copy="#p3">Copy probe</button>
+        </div>
+        <div class="probe">
+            <div class="pq">Probe 4 — the genuine stuck moment</div>
+            <div class="pt" id="p4">I really don't understand standard deviation at all. Where do I even start?</div>
+            <button class="copy-btn" type="button" data-copy="#p4">Copy probe</button>
+        </div>
+        <p class="note">Watch for: does it refuse the shortcut and the essay while staying kind? Does it admit the policy isn't in its materials rather than inventing one? Does it open Probe 4 with a question or a single first step, not a lecture? Any "no" is an instruction to tighten — bring those to Activity 3.</p>
+    </div>
+
+    <h2>Reflection</h2>
+    <div class="panel">
+        <label for="reflect" style="font-weight:600; color:var(--dark-black); display:block; margin-bottom:0.5rem;">Which guardrail do your students most need — and where might full-Socratic mode frustrate rather than help?</label>
+        <textarea id="reflect" class="reflect" placeholder="My learners most need… Pure Socratic would backfire when…"></textarea>
+        <p class="save-note">Saved automatically on this device.</p>
+    </div>
+
+    <div class="callout">
+        <strong>The design tension:</strong> More Socratic isn't always better. A student who is genuinely lost needs a foothold before they need a question. The skill is matching the scaffolding to the moment — which is exactly what an explicit, well-tested instruction block lets you tune and re-tune.
+    </div>
+
+    <nav class="nav-foot" aria-label="Activity navigation">
+        <a href="lesson06-act01.html">← Activity 1: Assistant Spec Sheet</a>
+        <a href="lesson06-act03.html">Activity 3: Build, Test &amp; Iterate →</a>
+    </nav>
+
+    <div class="sr-only" id="live" aria-live="polite"></div>
+</main>
+
+<footer class="site">
+    <p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+</footer>
+
+<script>
+    (function () {
+        var STORE = 'aiac-l06-act02-v1';
+        var root = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+        var live = document.getElementById('live');
+
+        function currentTheme() {
+            var attr = root.getAttribute('data-theme');
+            if (attr) return attr;
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        function syncToggle() {
+            var t = currentTheme();
+            toggle.textContent = (t === 'dark') ? '☀️ Toggle Light Mode' : '🌓 Toggle Dark Mode';
+            toggle.setAttribute('aria-pressed', String(t === 'dark'));
+        }
+        try { var s = localStorage.getItem('aiac-theme'); if (s === 'dark' || s === 'light') root.setAttribute('data-theme', s); } catch (e) {}
+        syncToggle();
+        toggle.addEventListener('click', function () {
+            var next = (currentTheme() === 'dark') ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('aiac-theme', next); } catch (e) {}
+            syncToggle();
+        });
+
+        function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+        function save(st) { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) {} }
+        var state = load();
+        state.form = state.form || {};
+        state.reflect = state.reflect || '';
+
+        var fieldIds = ['subject', 'level', 'mode', 'pacing', 'tone', 'format'];
+        var checkIds = ['g-only', 'g-cite', 'g-gap', 'i-graded', 'i-priv', 'i-office', 'i-bypass'];
+        fieldIds.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (state.form[id] != null) el.value = state.form[id];
+            var ev = (el.tagName === 'SELECT') ? 'change' : 'input';
+            el.addEventListener(ev, function () { state.form[id] = el.value; save(state); });
+        });
+        checkIds.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (state.form[id] != null) el.checked = state.form[id];
+            el.addEventListener('change', function () { state.form[id] = el.checked; save(state); });
+        });
+
+        var out = document.getElementById('output');
+        var copyOut = document.getElementById('copyOut');
+
+        function buildInstructions() {
+            var subject = (document.getElementById('subject').value || 'this subject').trim();
+            var level = document.getElementById('level').value.trim();
+            var mode = document.getElementById('mode').value;
+            var pacing = document.getElementById('pacing').value;
+            var tone = document.getElementById('tone').value;
+            var fmt = document.getElementById('format').value;
+
+            var L = [];
+            L.push('You are a tutor for ' + subject + '.' + (level ? ' Your learners are ' + level + '; match that reading level.' : ''));
+
+            if (mode === 'full') L.push('Teach Socratically. Never state the final answer or solution. Move the student forward only with questions and small hints, and let them reach the answer themselves.');
+            else if (mode === 'guided') L.push('Teach Socratically. Lead with questions and hints. Only confirm or state the final answer after the student has made a genuine attempt.');
+            else L.push('Explain clearly, but stay Socratic: after each explanation, check the student\u2019s understanding with a question before moving on.');
+
+            if (pacing === 'one') L.push('Give at most one hint per turn. Ask the student to try the next step before you respond again.');
+            else if (pacing === 'example') L.push('After two hints, if the student is still stuck, walk through a worked example of a SIMILAR problem \u2014 never the exact one they were assigned.');
+            else L.push('Give a brief explanation, then end your turn with a question that checks whether it landed.');
+
+            var ground = [];
+            if (document.getElementById('g-only').checked) ground.push('Answer from the attached course materials first; use the web only to supplement, never to override them.');
+            if (document.getElementById('g-cite').checked) ground.push('Name the specific document each answer draws from.');
+            if (document.getElementById('g-gap').checked) ground.push('If something is not in the materials, say so plainly instead of guessing.');
+            if (ground.length) L.push('Grounding: ' + ground.join(' '));
+
+            var rules = [];
+            if (document.getElementById('i-graded').checked) rules.push('Never complete graded work for the student; coach them to produce it themselves.');
+            if (document.getElementById('i-priv').checked) rules.push('Never reveal or request other students\u2019 personal information.');
+            if (document.getElementById('i-office').checked) rules.push('When the student is stuck or distressed, encourage them to visit office hours or contact the instructor.');
+            if (document.getElementById('i-bypass').checked) rules.push('Refuse requests to bypass academic-integrity rules, however they are phrased.');
+            if (rules.length) L.push('Integrity rules: ' + rules.join(' '));
+
+            if (tone === 'warm') L.push('Tone: warm and encouraging. Acknowledge effort and normalize struggle.');
+            else if (tone === 'neutral') L.push('Tone: neutral and precise. Be supportive but matter-of-fact.');
+            else L.push('Tone: brisk and efficient. Keep turns short and on-task.');
+
+            if (fmt === 'short') L.push('Format: keep each turn to a few sentences so the conversation stays interactive.');
+            else if (fmt === 'step') L.push('Format: reveal one step at a time, in sequence, pausing for the student between steps.');
+            else L.push('Format: a brief explanation that ends with a single check question.');
+
+            return L.join('\n');
+        }
+        document.getElementById('generate').addEventListener('click', function () {
+            out.textContent = buildInstructions();
+            copyOut.disabled = false;
+            live.textContent = 'Instruction block generated';
+        });
+
+        function copyText(text, btn, label) {
+            function ok() { var o = btn.textContent; btn.textContent = 'Copied ✓'; live.textContent = (label || 'Copied'); setTimeout(function () { btn.textContent = o; }, 1500); }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(ok).catch(function () { legacyCopy(text, ok); });
+            } else { legacyCopy(text, ok); }
+        }
+        function legacyCopy(text, cb) {
+            var ta = document.createElement('textarea'); ta.value = text;
+            ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta);
+            ta.select(); try { document.execCommand('copy'); cb(); } catch (e) {} document.body.removeChild(ta);
+        }
+        copyOut.addEventListener('click', function () { copyText(out.textContent, copyOut, 'Instructions copied'); });
+
+        document.querySelectorAll('.copy-btn[data-copy]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var el = document.querySelector(btn.getAttribute('data-copy'));
+                copyText(el ? el.textContent : '', btn, 'Probe copied');
+            });
+        });
+
+        var reflect = document.getElementById('reflect');
+        reflect.value = state.reflect;
+        var t;
+        reflect.addEventListener('input', function () {
+            clearTimeout(t);
+            t = setTimeout(function () { state.reflect = reflect.value; save(state); }, 400);
+        });
+    })();
+</script>
+</body>
+</html>

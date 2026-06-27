@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Lesson 06 of Mastering AI Automation: designing code-free custom assistants — the shared anatomy of Custom GPTs, Gemini Gems, Claude Projects, and Microsoft Copilot agents, plus context grounding and Socratic scaffolding for faculty.">
+    <title>Lesson 06: Designing Custom Assistants</title>
+    <style>
+        :root {
+            --primary-green: #15803d;
+            --light-green: #bbf7d0;
+            --accent-green: #f0fdf4;
+            --dark-black: #111827;
+            --soft-black: #374151;
+            --pure-white: #ffffff;
+            --bg-gray: #f9fafb;
+            --border-color: #e5e7eb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: #ffffff;
+            --code-bg: #f3f4f6;
+            --focus-ring: #166534;
+        }
+
+        [data-theme="dark"] {
+            --bg-gray: #111827;
+            --dark-black: #f9fafb;
+            --soft-black: #d1d5db;
+            --pure-white: #1f2937;
+            --card-bg: #1f2937;
+            --border-color: #374151;
+            --accent-green: #14532d;
+            --light-green: #4ade80;
+            --code-bg: #0f172a;
+            --focus-ring: #4ade80;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-gray: #111827;
+                --dark-black: #f9fafb;
+                --soft-black: #d1d5db;
+                --pure-white: #1f2937;
+                --card-bg: #1f2937;
+                --border-color: #374151;
+                --accent-green: #14532d;
+                --light-green: #4ade80;
+                --code-bg: #0f172a;
+                --focus-ring: #4ade80;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-gray);
+            color: var(--dark-black);
+            line-height: 1.6;
+            padding-bottom: 5rem;
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: 0;
+            background: var(--primary-green);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            z-index: 100;
+            border-radius: 0 0 6px 0;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .skip-link:focus {
+            left: 0;
+        }
+
+        header.site {
+            background-color: #111827;
+            color: #ffffff;
+            padding: 2rem;
+            border-bottom: 5px solid var(--primary-green);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-back {
+            color: #86efac;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .nav-back:hover {
+            text-decoration: underline;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-height: 44px;
+        }
+
+        .theme-toggle-btn:hover {
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .lesson-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--primary-green);
+            margin-bottom: 0.75rem;
+        }
+
+        .lesson-header h1 {
+            font-size: clamp(1.9rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            border-left: 6px solid var(--primary-green);
+            padding-left: 1rem;
+            line-height: 1.15;
+        }
+
+        .description-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .description-box p {
+            margin-bottom: 1rem;
+            color: var(--soft-black);
+        }
+        .description-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1.25rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-green);
+            color: var(--dark-black);
+        }
+
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            color: var(--soft-black);
+        }
+
+        .objectives-list li::before {
+            content: "✓";
+            color: var(--primary-green);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .terms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            perspective: 1000px;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            text-align: inherit;
+            display: block;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            min-height: 150px;
+            display: grid;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            grid-area: 1 / 1;
+            width: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .flip-card-front {
+            background-color: var(--card-bg);
+            color: var(--dark-black);
+            border-bottom: 4px solid var(--primary-green);
+        }
+
+        .flip-card-front strong {
+            font-size: 1.1rem;
+        }
+
+        .flip-card-front .level {
+            font-size: 0.75rem;
+            color: var(--primary-green);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .flip-card-front .hint {
+            font-size: 0.7rem;
+            color: var(--soft-black);
+            margin-top: 0.75rem;
+        }
+
+        .flip-card-back {
+            background-color: var(--dark-black);
+            color: var(--bg-gray);
+            transform: rotateY(180deg);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        [data-theme="dark"] .flip-card-back {
+            background-color: #0b1220;
+            color: #e5e7eb;
+        }
+
+        .content-window {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+
+        .content-tabs {
+            display: flex;
+            background-color: rgba(0,0,0,0.03);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        [data-theme="dark"] .content-tabs {
+            background-color: rgba(255,255,255,0.04);
+        }
+
+        .tab-btn {
+            flex: 1 1 180px;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--soft-black);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-size: 0.95rem;
+            min-height: 44px;
+            font-family: inherit;
+        }
+
+        .tab-btn[aria-selected="true"] {
+            color: var(--primary-green);
+            border-bottom-color: var(--primary-green);
+            background-color: var(--card-bg);
+        }
+
+        .content-pane {
+            padding: 2rem;
+        }
+        .content-pane[hidden] {
+            display: none;
+        }
+
+        .content-pane h3 {
+            color: var(--dark-black);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+        }
+        .content-pane h3:first-child {
+            margin-top: 0;
+        }
+
+        .content-pane p {
+            margin-top: 1rem;
+            color: var(--soft-black);
+        }
+
+        .content-pane p strong {
+            color: var(--dark-black);
+        }
+
+        .analogy-box {
+            background-color: var(--accent-green);
+            border-left: 4px solid var(--primary-green);
+            padding: 1rem 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 0 6px 6px 0;
+            color: var(--dark-black);
+        }
+        [data-theme="dark"] .analogy-box { color: var(--bg-gray); }
+
+        /* Comparison table */
+        .cmp-scroll { overflow-x: auto; margin-top: 1.25rem; }
+        table.cmp {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 680px;
+            font-size: 0.88rem;
+        }
+        table.cmp caption {
+            text-align: left;
+            color: var(--soft-black);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        table.cmp th, table.cmp td {
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 0.7rem;
+            text-align: left;
+            vertical-align: top;
+            color: var(--soft-black);
+        }
+        table.cmp thead th {
+            background: var(--accent-green);
+            color: var(--dark-black);
+            font-weight: 700;
+        }
+        [data-theme="dark"] table.cmp thead th { color: var(--bg-gray); }
+        table.cmp tbody th {
+            background: var(--card-bg);
+            color: var(--dark-black);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .callout {
+            background: var(--accent-green);
+            border: 1px solid var(--light-green);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-top: 1.5rem;
+            color: var(--dark-black);
+        }
+        [data-theme="dark"] .callout { color: var(--bg-gray); }
+        .callout strong { color: var(--primary-green); }
+        [data-theme="dark"] .callout strong { color: var(--light-green); }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .activity-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--dark-black);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .activity-card:hover {
+            border-color: var(--primary-green);
+        }
+
+        .activity-num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            color: var(--dark-black);
+        }
+
+        .activity-card p {
+            font-size: 0.9rem;
+            color: var(--soft-black);
+            margin-bottom: 1.5rem;
+        }
+
+        .launch-btn {
+            background-color: var(--primary-green);
+            color: white;
+            text-decoration: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .launch-btn:hover {
+            opacity: 0.9;
+        }
+
+        footer.site {
+            text-align: center;
+            margin-top: 5rem;
+            color: var(--soft-black);
+            font-size: 0.85rem;
+            padding: 0 1.5rem;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+            .flip-card-inner { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site">
+    <div class="header-container">
+        <a href="index.html" class="nav-back">← Back to Course Dashboard</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+</header>
+
+<main class="container" id="main">
+    <div class="lesson-header">
+        <span class="eyebrow">Day 1 · Development Track · Lesson 06</span>
+        <h1>Designing Custom Assistants</h1>
+        <div class="description-box">
+            <p><strong>Course Target:</strong> Engineer code-free, specialized assistants — Custom GPTs, Gemini Gems, Claude Projects, and Microsoft Copilot agents — by giving them clear instructions, grounding them in your own materials, and shaping how they interact through <em>Socratic scaffolding</em>.</p>
+            <p>A custom assistant is not a new model and not a coding project. It is a reusable briefing that sits on top of a chat model and loads before every conversation, so the assistant opens already knowing its job, its sources, and its rules. In this lesson, faculty learn the one design that all four tools share, how to ground an assistant in course materials so it stops inventing, and how to write instructions that teach by guiding rather than by handing over the answer.</p>
+        </div>
+    </div>
+
+    <section aria-labelledby="obj-h">
+        <h2 id="obj-h">Learning Objectives</h2>
+        <ul class="objectives-list">
+            <li>Identify the shared building blocks of a custom assistant — name, system instructions, grounding knowledge, capabilities, and sharing — and recognize them across Custom GPTs, Gemini Gems, Claude Projects, and Copilot agents.</li>
+            <li>Write system instructions that ground an assistant in your own course materials so it answers from your sources rather than the model's training data.</li>
+            <li>Apply Socratic scaffolding so an assistant guides learners with questions and staged hints instead of handing over finished answers.</li>
+            <li>Build, stress-test, and iterate an assistant against a small bank of edge-case prompts until its behavior is reliable.</li>
+        </ul>
+    </section>
+
+    <section aria-labelledby="terms-h">
+        <h2 id="terms-h">Key Terms</h2>
+        <p style="font-size:0.9rem; color:var(--soft-black); margin-bottom: 1rem;">Select any card to flip it and reveal the definition. Cards are keyboard-operable — press Enter or Space.</p>
+        <div class="terms-grid">
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>Custom Assistant</strong>
+                        <span class="level">No-code</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>A reusable, configured version of a chat model — a saved name, standing instructions, and optional reference files — that opens ready for one job, so you never re-paste your setup. Custom GPTs, Gemini Gems, Claude Projects, and Copilot agents are all this same idea.</p>
+                    </div>
+                </div>
+            </button>
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>System Instructions</strong>
+                        <span class="level">The standing prompt</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>The persistent prompt that defines the assistant's role, scope, tone, rules, and what it must never do. It loads at the start of every conversation, so behavior stays consistent without re-briefing it each time.</p>
+                    </div>
+                </div>
+            </button>
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>Context Grounding</strong>
+                        <span class="level">Knowledge files</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>Attaching your own documents — syllabi, rubrics, policies — as a knowledge base so the assistant answers from those sources instead of its training data, making replies specific, current, and checkable against what you actually teach.</p>
+                    </div>
+                </div>
+            </button>
+
+            <button class="flip-card" type="button" aria-pressed="false">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <strong>Socratic Scaffolding</strong>
+                        <span class="level">Guide, don't give</span>
+                        <span class="hint">Tap to flip</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>Instruction design that makes the assistant ask probing questions and reveal hints in stages, supporting a learner toward the answer rather than just delivering it — the difference between a tutor and an answer key.</p>
+                    </div>
+                </div>
+            </button>
+
+        </div>
+    </section>
+
+    <section aria-labelledby="outline-h">
+        <h2 id="outline-h">Course Outline &amp; Lesson Modules</h2>
+        <div class="content-window">
+            <div class="content-tabs" role="tablist" aria-label="Lesson 06 reading sections">
+                <button class="tab-btn" id="tab-0" type="button" role="tab" aria-selected="true" aria-controls="pane-0" tabindex="0">Page 1: One Idea, Four Tools</button>
+                <button class="tab-btn" id="tab-1" type="button" role="tab" aria-selected="false" aria-controls="pane-1" tabindex="-1">Page 2: Grounding Your Sources</button>
+                <button class="tab-btn" id="tab-2" type="button" role="tab" aria-selected="false" aria-controls="pane-2" tabindex="-1">Page 3: Socratic Design &amp; Iteration</button>
+            </div>
+
+            <div class="content-pane" id="pane-0" role="tabpanel" aria-labelledby="tab-0" tabindex="0">
+                <h3>The shared anatomy of an assistant</h3>
+                <p>Whatever the brand on the box, a custom assistant is the same thing: a configuration layer that sits on top of a base chat model. You are not training a model and you are not writing code — you are packaging a briefing the model reads <em>before</em> every conversation. Learn that briefing once and the skill transfers to all four tools.</p>
+                <p>Nearly every builder asks you to fill in the same handful of parts:</p>
+                <p><strong>1. A name and short description.</strong> So you and your colleagues can find the assistant later and understand its job at a glance.</p>
+                <p><strong>2. System instructions.</strong> The standing prompt — the heart of the whole thing. It sets the role, scope, tone, rules, and the lines the assistant must not cross.</p>
+                <p><strong>3. Grounding knowledge.</strong> Reference files the assistant can draw on: your syllabus, rubric, or policy documents.</p>
+                <p><strong>4. Capabilities and tools.</strong> Optional powers such as web search, data analysis, image generation, or connections to other apps.</p>
+                <p><strong>5. Conversation starters.</strong> A few example prompts that remove the blank-page problem for first-time users.</p>
+                <p><strong>6. Sharing and permissions.</strong> Keep it private, share by link, or roll it out to a team or whole institution.</p>
+                <div class="analogy-box">
+                    <strong>Conceptual analogy:</strong> Building a custom assistant is less like hiring a new employee and more like writing the onboarding binder and the standing orders for a very capable temp who shows up fresh every morning. Same model underneath — but now briefed, scoped, and pointed at the right shelf of documents before anyone asks the first question.
+                </div>
+            </div>
+
+            <div class="content-pane" id="pane-1" role="tabpanel" aria-labelledby="tab-1" tabindex="0" hidden>
+                <h3>Why grounding changes the answer</h3>
+                <p>By default a chat model answers from patterns learned in training. It is fluent, but generic — and it can confidently state a due date, a policy, or a figure that is simply wrong for <em>your</em> course. <strong>Context grounding</strong> fixes this by attaching your own materials so the assistant answers from your syllabus and your rubric, says "that isn't in the course materials" instead of inventing, and stays consistent with what you actually teach.</p>
+                <h3>How each builder grounds its answers</h3>
+                <p><strong>Custom GPTs (ChatGPT).</strong> In the Configure tab, upload files under <em>Knowledge</em>. One caution: people who use the GPT may be able to download those files, so never ground a shared GPT in anything sensitive.</p>
+                <p><strong>Gemini Gems.</strong> Add files under <em>Knowledge</em>, or pull them from Google Drive — a Drive-linked file updates automatically when you edit the original. For a larger curated source set, connect a NotebookLM notebook.</p>
+                <p><strong>Claude Projects.</strong> A shared <em>Files</em> knowledge base is available to every chat in the project. On paid plans, retrieval lets that knowledge base scale well beyond what fits in a single conversation.</p>
+                <p><strong>Microsoft Copilot agents.</strong> Ground in SharePoint sites, the public web, or Microsoft 365 connectors. Agents respect existing permissions — "no new privileges" — so a user only ever sees content they were already allowed to see.</p>
+                <div class="cmp-scroll">
+                    <table class="cmp">
+                        <caption>How the four no-code builders compare on where you build, how they ground, and who can create them.</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Builder</th>
+                                <th scope="col">Where you build it</th>
+                                <th scope="col">How it grounds</th>
+                                <th scope="col">Who can build</th>
+                                <th scope="col">Best fit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Custom GPT</th>
+                                <td>ChatGPT web → Explore GPTs → Create</td>
+                                <td>Uploaded knowledge files</td>
+                                <td>Paid plans (Plus, Pro, Team, Enterprise)</td>
+                                <td>Shareable task assistants &amp; the GPT Store</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Gemini Gem</th>
+                                <td>gemini.google.com → Gems → New Gem</td>
+                                <td>Uploads, Google Drive, NotebookLM</td>
+                                <td>Free and paid tiers</td>
+                                <td>Google Workspace users &amp; quick reuse</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Claude Project</th>
+                                <td>claude.ai → Projects → New project</td>
+                                <td>Files knowledge base (retrieval on paid)</td>
+                                <td>Free (limited) and paid plans</td>
+                                <td>Document-heavy, careful reasoning work</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Copilot agent</th>
+                                <td>Microsoft 365 Copilot → Agent Builder (or Copilot Studio)</td>
+                                <td>SharePoint, web, M365 connectors</td>
+                                <td>Microsoft 365 Copilot licensees</td>
+                                <td>Institutional data behind existing permissions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>Practical example</h3>
+                <p>Picture a "Course Concierge" grounded in your syllabus, schedule, and rubric. A student asks when the second project is due or how participation is weighted; the assistant answers in your phrasing, cites the document it drew from, and — when a question isn't covered — points the student to office hours instead of guessing. Same build pattern in any of the four tools; only the upload screen differs.</p>
+            </div>
+
+            <div class="content-pane" id="pane-2" role="tabpanel" aria-labelledby="tab-2" tabindex="0" hidden>
+                <h3>Designing instructions that teach</h3>
+                <p>For an educational assistant, the instructions are where your pedagogy lives. A tutor that simply answers is an answer key with a friendlier voice. <strong>Socratic scaffolding</strong> means telling the assistant, explicitly, to ask before it tells — and to reveal help in stages.</p>
+                <p>Effective patterns to write into the instructions include: ask the student what they have already tried before offering help; give at most one hint per turn; have the student attempt the next step before you confirm it; and if they are still stuck after a few hints, show a worked example of a <em>similar</em> problem rather than the assigned one. The goal is a productive struggle, not a shortcut around it.</p>
+                <h3>Guardrails and integrity</h3>
+                <p>Two rules belong in almost every educational assistant. First, <strong>protect privacy:</strong> keep student names, grades, and other personal data out of the knowledge base entirely. Second, <strong>protect the learning:</strong> instruct the assistant to refuse to complete graded work, to coach the student to produce it themselves, and to cite course materials while flagging anything they don't cover. (Lesson 11 returns to FERPA and governance in depth.)</p>
+                <h3>The build–test–refine loop</h3>
+                <p>No instruction set is right on the first try. Build the assistant, then stress-test it with a small spread of prompts: a simple request, a complex multi-step one, an ambiguous one, an out-of-scope one, and a contradictory one. Watch where it misses, then tighten the instructions — usually by adding an explicit "do not" rule or a short example — and test again. Remember that instructions are behavioral guardrails, not security controls: assume a determined user will push, and design accordingly.</p>
+                <div class="callout">
+                    <strong>Integrity guardrail:</strong> A custom assistant doesn't replace your teaching judgment — it encodes it. The better your instructions and grounding, the more reliably it behaves like you on your best day. The work of this lesson is getting that encoding right, then verifying it, not trusting it sight unseen.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section aria-labelledby="act-h">
+        <h2 id="act-h">Hands-on Workspace Modules</h2>
+        <div class="activities-grid">
+
+            <div class="activity-card">
+                <div>
+                    <div class="activity-num">Activity 01</div>
+                    <h3>Assistant Spec Sheet</h3>
+                    <p>Plan before you build. Define your assistant's purpose, audience, role, grounding sources, and guardrails, then generate a portable spec block you can drop into any of the four builders.</p>
+                </div>
+                <a href="lesson06-act01.html" class="launch-btn">Open Activity 1</a>
+            </div>
+
+            <div class="activity-card">
+                <div>
+                    <div class="activity-num">Activity 02</div>
+                    <h3>Socratic Instruction Builder</h3>
+                    <p>Assemble a system-instruction block for a grounded tutor — choosing how Socratic it should be, what it must never do, and how it cites your materials — then copy it straight into your builder.</p>
+                </div>
+                <a href="lesson06-act02.html" class="launch-btn">Open Activity 2</a>
+            </div>
+
+            <div class="activity-card">
+                <div>
+                    <div class="activity-num">Activity 03</div>
+                    <h3>Build, Test &amp; Iterate</h3>
+                    <p>Stand up your assistant in a chosen platform, then run it through an edge-case stress test and log what breaks, refining the instructions until the behavior holds.</p>
+                </div>
+                <a href="lesson06-act03.html" class="launch-btn">Open Activity 3</a>
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<footer class="site">
+    <p>Mastering AI Automation: Bots, Agents, and Agentic Browsers — Professional Development Course</p>
+</footer>
+
+<script>
+    (function () {
+        // ---- Theme handling: respects system preference, persists choice ----
+        var root = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+
+        function currentTheme() {
+            var attr = root.getAttribute('data-theme');
+            if (attr) return attr;
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        function syncToggle() {
+            var t = currentTheme();
+            toggle.textContent = (t === 'dark') ? '☀️ Toggle Light Mode' : '🌓 Toggle Dark Mode';
+            toggle.setAttribute('aria-pressed', String(t === 'dark'));
+        }
+        try {
+            var saved = localStorage.getItem('aiac-theme');
+            if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+        } catch (e) {}
+        syncToggle();
+
+        toggle.addEventListener('click', function () {
+            var next = (currentTheme() === 'dark') ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('aiac-theme', next); } catch (e) {}
+            syncToggle();
+        });
+
+        // ---- Flip cards (keyboard + click) ----
+        var cards = document.querySelectorAll('.flip-card');
+        cards.forEach(function (card) {
+            card.addEventListener('click', function () {
+                var flipped = card.classList.toggle('flipped');
+                card.setAttribute('aria-pressed', String(flipped));
+            });
+        });
+
+        // ---- Tabs with roving tabindex + arrow-key navigation ----
+        var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+        function selectTab(tab) {
+            tabs.forEach(function (t) {
+                var selected = (t === tab);
+                t.setAttribute('aria-selected', String(selected));
+                t.setAttribute('tabindex', selected ? '0' : '-1');
+                var pane = document.getElementById(t.getAttribute('aria-controls'));
+                if (pane) pane.hidden = !selected;
+            });
+        }
+        tabs.forEach(function (tab, i) {
+            tab.addEventListener('click', function () { selectTab(tab); });
+            tab.addEventListener('keydown', function (e) {
+                var idx = i;
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { idx = (i + 1) % tabs.length; }
+                else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { idx = (i - 1 + tabs.length) % tabs.length; }
+                else if (e.key === 'Home') { idx = 0; }
+                else if (e.key === 'End') { idx = tabs.length - 1; }
+                else { return; }
+                e.preventDefault();
+                tabs[idx].focus();
+                selectTab(tabs[idx]);
+            });
+        });
+    })();
+</script>
+</body>
+</html>
